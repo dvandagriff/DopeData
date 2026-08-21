@@ -1,371 +1,414 @@
-<div id="top">
+<div align="right">
+  <sup><em>DREW-V Indie Lab Research · MIT Licensed</em></sup>
+</div>
 
-<!-- HEADER STYLE: CLASSIC -->
+<br>
+
 <div align="center">
 
-<img src=".github/images/icon.jpg" width="30%" style="position: relative; top: 0; right: 0;" alt="Project Logo"/>
+<img src=".github/images/banner.jpg" width="85%" alt="DopeData Banner"/>
 
-# ❯ Data Observatory - Pipeline Observability
+# DopeData
 
-This tool is DOPE
+### Pipeline Observability for the Modern Data Stack
 
-<!-- BADGES -->
-<!-- local repository, no metadata badges. -->
+<!-- BADGE ROW -->
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![uv](https://img.shields.io/badge/uv-DE5FE9?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2IiBmaWxsPSJub25lIj48L3N2Zz4=)
+![Ruff](https://img.shields.io/badge/Ruff-D7FF64?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2IiBmaWxsPSJub25lIj48L3N2Zz4=)
+![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=flat-square&logo=pytest&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-Built with the tools and technologies:
+**Fivetran &rarr; dbt lineage tracking · Business-day freshness intelligence · Zero-cloud, zero-lock-in**
 
-<img src="https://img.shields.io/badge/TOML-9C4121.svg?style=default&logo=TOML&logoColor=white" alt="TOML">
-<img src="https://img.shields.io/badge/Ruff-D7FF64.svg?style=default&logo=Ruff&logoColor=black" alt="Ruff">
-<img src="https://img.shields.io/badge/Pytest-0A9EDC.svg?style=default&logo=Pytest&logoColor=white" alt="Pytest">
-<img src="https://img.shields.io/badge/Python-3776AB.svg?style=default&logo=Python&logoColor=white" alt="Python">
-<img src="https://img.shields.io/badge/uv-DE5FE9.svg?style=default&logo=uv&logoColor=white" alt="uv">
+[⚡ Quick Start](#-quick-start) · [📐 Architecture](#-architecture) · [🔌 Plugins](#-plugin-system) · [🧪 Testing](#-testing)
 
 </div>
+
 <br>
 
 ---
 
-## Table of Contents
+## &nbsp;&#128300;&nbsp; What Is DopeData?
 
-- [Table of Contents](#table-of-contents)
-- [Overview](#overview)
-- [Features](#features)
-- [Project Structure](#project-structure)
-    - [Project Index](#project-index)
-- [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-    - [Usage](#usage)
-    - [Testing](#testing)
+DopeData is a **local-first, zero-dependency pipeline observability toolkit** that maps your Fivetran &rarr; Snowflake &rarr; dbt data lineage into a queryable graph — and tells you whether your data is fresh according to business calendars, not just wall-clock timestamps.
 
----
+It answers three questions every data team faces:
 
-## Overview
+| Question | DopeData Answer |
+| :--- | :--- |
+| **&ldquo;If this pipeline breaks, what breaks downstream?&rdquo;** | Graph-based seeded lineage walks from connector to dashboard &mdash; full impact surface in seconds. |
+| **&ldquo;Is my data stale or just weekend-late?&rdquo;** | Business-day-aware staleness checks that account for weekends *and* US federal holidays. |
+| **&ldquo;Can I run this without a cloud API key?&rdquo;** | Snapshot mode ingests local CSV/JSON — no credentials, no accounts, no vendor lock-in. Go. |
 
-Introducing **Dope**, a powerful developer tool designed to simplify data pipeline management and provide unparalleled insights into data relationships and transformations.
+> [!NOTE]
+> DopeData works at `0.1` maturity. It is a working prototype built for indie research and learning. The code is clean, the tests pass, and the demo script shows the full stack in under 30 seconds. **It is not production-ready — but it is production-plausible.**
 
-**Why Dope?**
-This project empowers developers to build more transparent, maintainable, and scalable data-driven solutions. The core features include:
-
-- **💡 Graph-based data modeling:** Enables creation and manipulation of complex graph structures, facilitating traversal and analysis of graph data.
-- **🔄 Pipeline data ingestion infrastructure:** Provides plugins for loading external data into a graph store, supporting flexible integration with various data sources.
-- **🔍 Data lineage management:** Enables tracking of data origins and transformations throughout the system, maintaining data integrity and transparency.
-- **📊 Freshness report generation:** Generates reports detailing pipeline staleness across all nodes in the graph store, providing insights into data freshness and potential issues.
-- **📈 Interactive visualization:** Generates self-contained HTML files visualizing pipeline lineage and freshness using Cytoscape.js, allowing users to explore the pipeline's structure and identify areas for improvement.
+<div align="center">
+<table>
+<tr><th>Metric</th><th>Status</th></tr>
+<tr><td>Python packages required (core)</td><td>&#128994; Zero — pure Python stdlib for the core graph engine</td></tr>
+<tr><td>Test coverage</td><td>&#128994; pytest suite with dedicated freshness, lineage, graph, and plugin tests</td></tr>
+<tr><td>Licensing</td><td>&#128994; MIT — do whatever you want</td></tr>
+<tr><td>Optional backend</td><td>&#128994; Kùzu embedded graph DB for full Cypher support (opt-in)</td></tr>
+</table>
+</div>
 
 ---
 
-## Features
-
-|      | Component       | Details                              |
-| :--- | :-------------- | :----------------------------------- |
-| ⚙️  | **Architecture**  | <ul><li>Python-based</li><li>Utilizes `pyproject.toml` for configuration</li></ul> |
-| 🔩 | **Code Quality**  | <ul><li>Enforces code standards with `ruff` and `mypy`</li><li>Uses `pytest` for testing</li></ul> |
-| 📄 | **Documentation** | <ul><li>No explicit documentation framework detected</li><li>License information available in `license` file</li></ul> |
-| 🔌 | **Integrations**  | <ul><li>Utilizes `uv.lock` for locking mechanisms</li><li>Integrates with `kuzu` (purpose unclear)</li></ul> |
-| 🧩 | **Modularity**    | <ul><li>No explicit modularity framework detected</li><li>Organized using a single `pyproject.toml` file</li></ul> |
-| 🧪 | **Testing**       | <ul><li>Uses `pytest` for testing</li><li>No test coverage metrics available</li></ul> |
-| ⚡️  | **Performance**   | <ul><li>No explicit performance optimization techniques detected</li><li>Relies on Python's built-in performance features</li></ul> |
-| 🛡️ | **Security**      | <ul><li>No explicit security measures detected</li><li>License information available in `license` file</li></ul> |
-| 📦 | **Dependencies**  | <ul><li>`pyproject.toml` for configuration</li><li>`uv.lock` for locking mechanisms</li><li>`makefile` for build automation</li></ul> |
-| 🚀 | **Scalability**   | <ul><li>No explicit scalability measures detected</li><li>Relies on Python's built-in concurrency features</li></ul> |
-
----
-
-## Project Structure
-
-```sh
-└── /
-    ├── LICENSE
-    ├── Makefile
-    ├── README.md
-    ├── data
-    │   └── snapshots
-    ├── docs
-    │   ├── ARCHITECTURE.md
-    │   ├── BUILD_DIRECTIVE.md
-    │   └── FRESHNESS_RULE.md
-    ├── pyproject.toml
-    ├── scripts
-    │   ├── export_snapshots.py
-    │   ├── run_demo.py
-    │   └── seed_walk_demo.py
-    ├── src
-    │   ├── .DS_Store
-    │   └── dope
-    ├── tests
-    │   ├── __init__.py
-    │   ├── __pycache__
-    │   ├── smoke_test_plugins.py
-    │   ├── test_freshness.py
-    │   ├── test_graph.py
-    │   ├── test_lineage.py
-    │   └── test_plugins.py
-    └── uv.lock
-```
-
-### Project Index
-
-<details open>
-	<summary><b><code>/</code></b></summary>
-	<!-- __root__ Submodule -->
-	<details>
-		<summary><b>__root__</b></summary>
-		<blockquote>
-			<div class='directory-path' style='padding: 8px 0; color: #666;'>
-				<code><b>⦿ __root__</b></code>
-			<table style='width: 100%; border-collapse: collapse;'>
-			<thead>
-				<tr style='background-color: #f8f9fa;'>
-					<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-					<th style='text-align: left; padding: 8px;'>Summary</th>
-				</tr>
-			</thead>
-				<tr style='border-bottom: 1px solid #eee;'>
-					<td style='padding: 8px;'><b><a href='/LICENSE'>LICENSE</a></b></td>
-					<td style='padding: 8px;'>- Establishes the licensing terms for the entire project, granting users permission to freely use, modify, and distribute the software while requiring attribution and inclusion of the copyright notice<br>- The license ensures that the authors are not liable for any claims or damages arising from the softwares use<br>- It provides a clear framework for collaboration and contribution to the project.</td>
-				</tr>
-				<tr style='border-bottom: 1px solid #eee;'>
-					<td style='padding: 8px;'><b><a href='/Makefile'>Makefile</a></b></td>
-					<td style='padding: 8px;'>- Manages project workflows by defining tasks for demonstration, testing, live execution, cleaning, formatting, and linting<br>- Enables developers to execute specific commands to run demos, perform unit tests, clean up generated files, format code, and check for errors<br>- Simplifies the development process by providing a centralized way to control various aspects of the project, ensuring consistency and efficiency across different tasks and environments.</td>
-				</tr>
-				<tr style='border-bottom: 1px solid #eee;'>
-					<td style='padding: 8px;'><b><a href='/pyproject.toml'>pyproject.toml</a></b></td>
-					<td style='padding: 8px;'>- Configures the foundation of the Data Observatory project, defining its metadata, dependencies, and build settings<br>- Establishes the projects identity, versioning, and licensing information, while also specifying requirements for Python compatibility and development tools<br>- Additionally, it sets up scripts and build systems, ensuring a solid base for the projects architecture and facilitating efficient development and deployment of pipeline observability features.</td>
-				</tr>
-			</table>
-		</blockquote>
-	</details>
-	<!-- scripts Submodule -->
-	<details>
-		<summary><b>scripts</b></summary>
-		<blockquote>
-			<div class='directory-path' style='padding: 8px 0; color: #666;'>
-				<code><b>⦿ scripts</b></code>
-			<table style='width: 100%; border-collapse: collapse;'>
-			<thead>
-				<tr style='background-color: #f8f9fa;'>
-					<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-					<th style='text-align: left; padding: 8px;'>Summary</th>
-				</tr>
-			</thead>
-				<tr style='border-bottom: 1px solid #eee;'>
-					<td style='padding: 8px;'><b><a href='/scripts/run_demo.py'>run_demo.py</a></b></td>
-					<td style='padding: 8px;'>- Runs a one-shot demo of the data lineage tool, loading snapshots from Fivetran and dbt, performing seed walks on specified connectors, and generating reports on data freshness and lineage<br>- The demo outputs Cypher queries, tabular freshness reports, and writes HTML and CSV files for visualization and analysis<br>- It provides a comprehensive overview of the data pipelines health and dependencies.</td>
-				</tr>
-				<tr style='border-bottom: 1px solid #eee;'>
-					<td style='padding: 8px;'><b><a href='/scripts/export_snapshots.py'>export_snapshots.py</a></b></td>
-					<td style='padding: 8px;'>- Exports live snapshot data from Fivetran and dbt Cloud APIs to a local directory<br>- Requires environment variables for API credentials, which are not configured by default<br>- The script writes exported data to the <code>data/live/</code> directory, including connections, schemas, manifest, and run results<br>- It serves as a critical component in the projects data pipeline, enabling further processing and analysis of live snapshot data.</td>
-				</tr>
-				<tr style='border-bottom: 1px solid #eee;'>
-					<td style='padding: 8px;'><b><a href='/scripts/seed_walk_demo.py'>seed_walk_demo.py</a></b></td>
-					<td style='padding: 8px;'>- Demonstrates the core seed walk loop by iterating over all connector IDs, showcasing a 4-line process that loads plugins into a graph, retrieves connector IDs from a snapshot, and performs a seed walk for each ID<br>- The script provides a demo of the dope seed walk functionality, highlighting its ability to traverse lineage nodes and edges across multiple connectors.</td>
-				</tr>
-			</table>
-		</blockquote>
-	</details>
-	<!-- src Submodule -->
-	<details>
-		<summary><b>src</b></summary>
-		<blockquote>
-			<div class='directory-path' style='padding: 8px 0; color: #666;'>
-				<code><b>⦿ src</b></code>
-			<!-- dope Submodule -->
-			<details>
-				<summary><b>dope</b></summary>
-				<blockquote>
-					<div class='directory-path' style='padding: 8px 0; color: #666;'>
-						<code><b>⦿ src.dope</b></code>
-					<!-- core Submodule -->
-					<details>
-						<summary><b>core</b></summary>
-						<blockquote>
-							<div class='directory-path' style='padding: 8px 0; color: #666;'>
-								<code><b>⦿ src.dope.core</b></code>
-							<table style='width: 100%; border-collapse: collapse;'>
-							<thead>
-								<tr style='background-color: #f8f9fa;'>
-									<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-									<th style='text-align: left; padding: 8px;'>Summary</th>
-								</tr>
-							</thead>
-								<tr style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px;'><b><a href='/src/dope/core/freshness.py'>freshness.py</a></b></td>
-									<td style='padding: 8px;'>- Determines pipeline freshness by considering business days and holidays<br>- It calculates the last business day before a given date, checks if a pipeline is stale based on its last run end time, and returns an effective fresh date for a pipeline run<br>- The module provides functions to walk backward from a reference date until a weekday not in holidays is found, ensuring data reflects up-to-date business operations.</td>
-								</tr>
-								<tr style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px;'><b><a href='/src/dope/core/graph.py'>graph.py</a></b></td>
-									<td style='padding: 8px;'>- Summary<strong>The <code>graph.py</code> file is a core component of the project's architecture, responsible for managing and manipulating graph data structures<br>- It provides a foundation for building, traversing, and analyzing complex relationships between entities within the system.In the context of the larger codebase, this module enables the creation of a robust graph-based framework that can be leveraged by various components to model and interact with intricate networks of data<br>- By abstracting away low-level implementation details, <code>graph.py</code> empowers developers to focus on higher-level logic and domain-specific problem-solving.</strong>Key Achievements<em>*</em> Provides a centralized hub for graph-related functionality<em> Enables the creation and manipulation of complex graph structures</em> Facilitates traversal and analysis of graph dataBy utilizing this module, other components within the project can tap into its capabilities to build sophisticated applications that rely on graph-based modeling and reasoning.</td>
-								</tr>
-								<tr style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px;'><b><a href='/src/dope/core/kuzu_backend.py'>kuzu_backend.py</a></b></td>
-									<td style='padding: 8px;'>- Provides a Kùzu graph backend implementation, enabling the creation of on-disk or in-memory databases<br>- It offers methods for adding nodes and edges, executing Cypher queries, and saving/loading databases<br>- The code ensures compatibility with the GraphStore API and handles cases where Kùzu is not installed<br>- A factory function allows users to select between different backends, including PurePyGraph and Kùzu.</td>
-								</tr>
-								<tr style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px;'><b><a href='/src/dope/core/plugin.py'>plugin.py</a></b></td>
-									<td style='padding: 8px;'>- Provides pipeline data ingestion infrastructure through plugins that load external data into a graph store<br>- PipelinePlugin subclasses implement the ingest method to fetch data from sources like APIs or manifest files, supporting both full reload and incremental updates<br>- The plugin architecture enables flexible integration with various data sources, allowing for seamless data population and management within the pipeline.</td>
-								</tr>
-								<tr style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px;'><b><a href='/src/dope/core/schema.py'>schema.py</a></b></td>
-									<td style='padding: 8px;'>- Defines the core schema of the data catalog, outlining node types and relationships between them<br>- It establishes a standardized structure for representing Fivetran connections, Snowflake tables, dbt models and tests, and data products, enabling the creation of a comprehensive graph database that captures dependencies and lineage across these entities<br>- This schema serves as the foundation for data discovery, governance, and analytics within the larger architecture.</td>
-								</tr>
-							</table>
-						</blockquote>
-					</details>
-					<!-- plugins Submodule -->
-					<details>
-						<summary><b>plugins</b></summary>
-						<blockquote>
-							<div class='directory-path' style='padding: 8px 0; color: #666;'>
-								<code><b>⦿ src.dope.plugins</b></code>
-							<table style='width: 100%; border-collapse: collapse;'>
-							<thead>
-								<tr style='background-color: #f8f9fa;'>
-									<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-									<th style='text-align: left; padding: 8px;'>Summary</th>
-								</tr>
-							</thead>
-								<tr style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px;'><b><a href='/src/dope/plugins/dbt.py'>dbt.py</a></b></td>
-									<td style='padding: 8px;'>- Summary**The <code>dbt.py</code> file is a plugin for the Dope project, responsible for ingesting data from dbt (data build tool) into the graph<br>- Its primary purpose is to collect and process manifest and run-result data from dbt, making it available for further analysis and visualization within the Dope ecosystem.In the context of the entire codebase architecture, this plugin serves as a critical component for integrating dbt data sources with the Dope platform, enabling users to leverage the power of dbts data transformation capabilities alongside Dope's graph-based insights<br>- By ingesting dbt data, this plugin facilitates a more comprehensive understanding of data pipelines and workflows, ultimately enhancing the overall value proposition of the Dope project.</td>
-								</tr>
-								<tr style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px;'><b><a href='/src/dope/plugins/fivetran.py'>fivetran.py</a></b></td>
-									<td style='padding: 8px;'>- Ingests Fivetran connector metadata into a graph store, supporting snapshot and live ingestion modes<br>- Reads CSV files from a snapshot directory or queries the Fivetran REST API to populate the graph with FIVETRAN_CONNECTION and SNOWFLAKE_TABLE nodes, as well as SYNC_TO edges<br>- Handles data freshness and staleness, creating a comprehensive representation of Fivetran connector metadata in the graph store.</td>
-								</tr>
-							</table>
-						</blockquote>
-					</details>
-					<!-- cli Submodule -->
-					<details>
-						<summary><b>cli</b></summary>
-						<blockquote>
-							<div class='directory-path' style='padding: 8px 0; color: #666;'>
-								<code><b>⦿ src.dope.cli</b></code>
-							<table style='width: 100%; border-collapse: collapse;'>
-							<thead>
-								<tr style='background-color: #f8f9fa;'>
-									<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-									<th style='text-align: left; padding: 8px;'>Summary</th>
-								</tr>
-							</thead>
-								<tr style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px;'><b><a href='/src/dope/cli/main.py'>main.py</a></b></td>
-									<td style='padding: 8px;'>- Summary<strong>The <code>main.py</code> file serves as the entry point for the Command-Line Interface (CLI) of the Dope project<br>- Its primary purpose is to provide a user-friendly interface for interacting with the project's core functionality, allowing users to execute various commands and operations.In the context of the entire codebase architecture, this file acts as a bridge between the user and the underlying system, enabling seamless communication and control<br>- By leveraging this CLI, users can harness the full potential of the Dope project without needing to delve into the technical intricacies of the implementation.</strong>Key Achievements<em>*</em> Provides a user-friendly interface for interacting with the project's core functionality<em> Enables execution of various commands and operations</em> Acts as a bridge between the user and the underlying systemBy using this CLI, users can efficiently utilize the Dope projects capabilities, making it an essential component of the overall codebase architecture.</td>
-								</tr>
-							</table>
-						</blockquote>
-					</details>
-					<!-- query Submodule -->
-					<details>
-						<summary><b>query</b></summary>
-						<blockquote>
-							<div class='directory-path' style='padding: 8px 0; color: #666;'>
-								<code><b>⦿ src.dope.query</b></code>
-							<table style='width: 100%; border-collapse: collapse;'>
-							<thead>
-								<tr style='background-color: #f8f9fa;'>
-									<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
-									<th style='text-align: left; padding: 8px;'>Summary</th>
-								</tr>
-							</thead>
-								<tr style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px;'><b><a href='/src/dope/query/freshness_report.py'>freshness_report.py</a></b></td>
-									<td style='padding: 8px;'>- Generates a freshness report detailing pipeline staleness across all nodes in the graph store<br>- The report groups nodes by type and provides a tabular view of each nodes freshness status, including last run end time, staleness flag, and row count<br>- The report is exported to a CSV file for further analysis, offering insights into data freshness and potential issues within the pipeline.</td>
-								</tr>
-								<tr style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px;'><b><a href='/src/dope/query/lineage.py'>lineage.py</a></b></td>
-									<td style='padding: 8px;'>- Summary**The <code>lineage.py</code> file is a crucial component of the Dope project's query module<br>- Its primary purpose is to manage and resolve data lineage, enabling the tracking of data origins and transformations throughout the system<br>- This module plays a vital role in maintaining data integrity, transparency, and accountability within the larger codebase architecture.In essence, this code facilitates the creation of a data provenance graph, allowing users to understand how data has been processed, transformed, and related to other data entities<br>- By doing so, it provides a foundation for auditing, debugging, and optimizing data workflows, ultimately contributing to the overall reliability and trustworthiness of the Dope system.By incorporating this module, developers can ensure that their applications are equipped with robust data lineage capabilities, enabling them to build more transparent, maintainable, and scalable data-driven solutions.</td>
-								</tr>
-								<tr style='border-bottom: 1px solid #eee;'>
-									<td style='padding: 8px;'><b><a href='/src/dope/query/viz.py'>viz.py</a></b></td>
-									<td style='padding: 8px;'>- Generates a self-contained HTML file visualizing pipeline lineage and freshness using Cytoscape.js<br>- It takes seed walk results as input and produces an interactive graph displaying nodes, edges, and their relationships<br>- The visualization highlights fresh and stale data, allowing users to explore the pipelines structure and identify areas for improvement<br>- The output is a standalone HTML file that can be shared or embedded in other applications.</td>
-								</tr>
-							</table>
-						</blockquote>
-					</details>
-				</blockquote>
-			</details>
-		</blockquote>
-	</details>
-</details>
-
----
-
-## Getting Started
+## &nbsp;&#128640;&nbsp; Quick Start
 
 ### Prerequisites
 
-This project requires the following dependencies:
+| Requirement | Version |
+|:---|:---|
+| Python | `>=3.10` |
+| uv (recommended) | Latest from <https://docs.astral.sh/uv/> |
 
-- **Programming Language:** Python
-- **Package Manager:** Uv
+### Install
 
-### Installation
-
-Build  from the source and intsall dependencies:
-
-1. **Clone the repository:**
-
-    ```sh
-    ❯ git clone ../
-    ```
-
-2. **Navigate to the project directory:**
-
-    ```sh
-    ❯ cd 
-    ```
-
-3. **Install the dependencies:**
-
-<!-- SHIELDS BADGE CURRENTLY DISABLED -->
-	<!-- [![uv][uv-shield]][uv-link] -->
-	<!-- REFERENCE LINKS -->
-	<!-- [uv-shield]: https://img.shields.io/badge/uv-DE5FE9.svg?style=for-the-badge&logo=uv&logoColor=white -->
-	<!-- [uv-link]: https://docs.astral.sh/uv/ -->
-
-	**Using [uv](https://docs.astral.sh/uv/):**
-
-	```sh
-	❯ uv sync --all-extras --dev
-	```
-
-### Usage
-
-Run the project with:
-
-**Using [uv](https://docs.astral.sh/uv/):**
 ```sh
-uv run python {entrypoint}
+git clone https://github.com/dvandagriff/DopeData.git
+cd DopeData
+uv sync --all-extras --dev
 ```
 
-### Testing
+### Run the Demo
 
- uses the {__test_framework__} test framework. Run the test suite with:
+One command loads snapshot fixtures, builds a graph, walks lineage from every connector, and writes HTML visualizations + freshness reports:
 
-**Using [uv](https://docs.astral.sh/uv/):**
 ```sh
-uv run pytest tests/
+make demo
+# or directly:
+uv run python scripts/run_demo.py
+```
+
+Expected output files appear in `data/snapshots/`:
+
+- `lineage.html` — interactive Cytoscape.js graph visualization
+- `freshness_report.csv` — tabular staleness report per node
+
+### CLI Reference
+
+```sh
+# Walk lineage from a specific connector
+uv run dope seed-walk --seed stripe
+
+# Walk all connectors, output HTML + CSV report
+uv run dope scan --all-connectors --view all
+
+# Override the "as-of" date (e.g., test Monday morning freshness)
+uv run dope scan --seed random_words --as-of 2026-08-17
+
+# Use Kùzu backend for full Cypher queries
+uv run dope seed-walk --seed stripe --backend kuzu
 ```
 
 ---
 
-## License
+## &nbsp;&#129504;&nbsp; Architecture
 
- is protected under the [MIT LICENSE](https://choosealicense.com/licenses) License. For more details, refer to the [LICENSE](https://choosealicense.com/licenses/) file.
+DopeData follows a **plugin-driven, graph-first** architecture:
+
+```mermaid
+sequenceDiagram
+    participant CLI as CLI / User
+    participant Store as GraphStore
+    participant F as FivetranPlugin
+    participant D as DbtPlugin
+    participant Q as Query Layer
+
+    CLI->>F: ingest(store, mode="snapshot")
+    F->>Store: add_node(FivetranConnection)
+    F->>Store: add_node(SnowflakeTable)
+    F->>Store: add_edge(SYNC_TO)
+
+    CLI->>D: ingest(store, mode="snapshot")
+    D->>Store: add_node(dbtModel)
+    D->>Store: add_node(dbtTest)
+    D->>Store: add_edge(DEPENDS_ON)
+
+    CLI->>Q: seed_walk(connector_id)
+    Q->>Store: query(MATCH ... walk downstream)
+    Store-->>Q: {nodes, edges, stale}
+    Q-->>CLI: HTML viz + CSV report
+```
+
+### Graph Schema
+
+The entire data pipeline is modeled as a directed graph. Six node types and six edge types capture the full Fivetran &rarr; dbt flow:
+
+```mermaid
+erDiagram
+    FivetranConnection {
+        string id PK
+        string source_id
+        string name
+        string status
+        timestamp synced_at
+    }
+    SnowflakeTable {
+        string id PK
+        string database
+        string schema_name
+        string table_name
+        int64 row_count
+    }
+    dbtModel {
+        string id PK
+        string package_name
+        string name
+        string type
+        string materialization
+    }
+    dbtTest {
+        string id PK
+        string model_id
+        string name
+        string status
+    }
+    dbtSource {
+        string id PK
+        string package_name
+        string name
+        string database
+        string schema_name
+    }
+    DataProduct {
+        string id PK
+        string name
+        string description
+    }
+
+    FivetranConnection ||--o{ SYNC_TO : syncs to
+    SnowflakeTable ||--o{ FEEDS : feeds
+    dbtModel ||--o{ DEPENDS_ON : depends on
+    dbtModel ||--o{ PRODUCES : produces
+    dbtTest ||--o{ TESTS : tests
+    DataProduct ||--o{ EXPOSED_BY : exposed by
+```
+
+<details>
+<summary><b>&#128295;&nbsp; Node &amp; Edge Type Reference</b></summary>
+
+| Node Type | Description |
+|:---|:---|
+| `FivetranConnection` | A connector instance (Stripe, Salesforce, etc.) |
+| `SnowflakeTable` | Target warehouse table with row count / size metadata |
+| `dbtModel` | A dbt model — staging, intermediate, fact, dimension, etc. |
+| `dbtTest` | Test assertion running against a model |
+| `dbtSource` | Fivetran-synced source model in dbt manifest |
+| `DataProduct` | Upstream consumer (Power BI dashboard, API endpoint, ML model) |
+
+| Edge Type | Direction | Meaning |
+|:---|:---|:---|
+| `SYNC_TO` | Connector &rarr; Table | Fivetran syncs rows into this table |
+| `PRODUCES` | Model &rarr; Table | dbt materializes this table |
+| `DEPENDS_ON` | Model &rarr; Model | Transformation dependency chain |
+| `TESTS` | Test &rarr; Model | Test belongs to a model |
+| `FEEDS` | Table &rarr; Product | Table feeds downstream consumer |
+| `EXPOSED_BY` | Product &rarr; Model | Product depends on upstream model |
+
+</details>
+
+### Backend Options
+
+| Backend | Engine | Cypher Support | Install |
+|:---|:---|:---|:---|
+| **PurePyGraph** (default) | In-memory Python dict-based graph | Subset (`MATCH`, `WHERE`, `RETURN`) | Zero deps |
+| **Kùzu** | Embedded C++ graph DB on-disk/in-memory | Full Cypher 5.0 subset | `uv add dope[kuzu]` |
 
 ---
 
+## &nbsp;&#129302;&nbsp; Plugin System
 
-<div align="right">
+DopeData uses a plugin architecture for data ingestion. Each plugin knows how to fetch, transform, and load external data into the graph store.
 
-[![][back-to-top]](#top)
+### Available Plugins
+
+<details>
+<summary><b>&#128640;&nbsp; FivetranPlugin</b></summary>
+
+Ingests Fivetran connector metadata and schema information from local snapshot CSV/JSON files:
+
+- Reads `fivetran_connections.csv` — connector IDs, source types, sync status, timestamps
+- Reads `fivetran_schemas.csv` — table destinations (database, schema, name)
+- Reads `fivetran_dbt_bridge.csv` — maps Fivetran tables to dbt sources
+- Creates `FivetranConnection`, `SnowflakeTable` nodes and `SYNC_TO` edges
+
+```python
+from dope.core.plugin import load_plugins
+from dope.plugins.fivetran import FivetranPlugin
+
+store = make_backend("pure")
+plugin = FivetranPlugin(snapshot_dir="data/snapshots")
+plugin.ingest(store, mode="snapshot")
+```
+
+</details>
+
+<details>
+<summary><b>&#128300;&nbsp; DbtPlugin</b></summary>
+
+Ingests dbt manifest and run-results JSON:
+
+- Reads `dbt_nodes.json` — model graph, types, materializations, dependencies
+- Reads `dbt_run_results.json` — test statuses, durations, execution timestamps
+- Creates `dbtModel`, `dbtTest`, `dbtSource` nodes and `DEPENDS_ON`, `TESTS`, `PRODUCES` edges
+
+```python
+from dope.plugins.dbt import DbtPlugin
+
+store = make_backend("pure")
+plugin = DbtPlugin(snapshot_dir="data/snapshots")
+plugin.ingest(store, mode="snapshot")
+```
+
+</details>
+
+### Building Your Own Plugin
+
+Subclass `PipelinePlugin` and implement the `ingest` method:
+
+```python
+from dope.core.plugin import PipelinePlugin
+
+class MyCustomPlugin(PipelinePlugin):
+    def ingest(self, store, mode: str = "snapshot"):
+        # Fetch data from your source
+        # Call store.add_node() and store.add_edge()
+        pass
+```
+
+---
+
+## &nbsp;&#128203;&nbsp; Freshness Intelligence
+
+DopeData's staleness engine doesn't just check timestamps — it understands **business calendars**. A pipeline that ran last Friday is not stale on Monday morning if no business day has been missed.
+
+### The Rule
+
+```
+stale(LastRunEnd, AsOf) ≡ LastRunEnd < LastBusinessDay(AsOf)
+```
+
+Where `LastBusinessDay` walks backwards from the reference date skipping weekends and US federal holidays.
+
+### Example Walkthrough
+
+| Scenario | Result | Why |
+|:---|:---|:---|
+| Synced Aug 14 (Friday), checked Aug 17 (Monday) | &check; Fresh | Last biz day = Aug 14, data is current |
+| Synced Aug 10 (Monday), checked Aug 17 | &#10060; Stale | 5 business days behind |
+| Last run = `None` | &#10060; Stale | Pipeline never ran |
+| Synced on a holiday | &#128161; Edge case | Compare date directly against last biz day |
+
+### Configurable Holidays
+
+The 2026 US federal holidays are hardcoded in `src/dope/core/freshness.py`. For production use, swap in the [`holidays`](https://github.com/vacanza/holidays) library:
+
+```python
+import holidays
+US_HOLIDAYS = frozenset(holidays.US(years=range(2024, 2031)).keys())
+```
+
+Full freshness specification is documented in [`docs/FRESHNESS_RULE.md`](docs/FRESHNESS_RULE.md).
+
+---
+
+## &nbsp;&#128193;&nbsp; Project Structure
+
+```
+dope/
+├── LICENSE                    # MIT License (do whatever)
+├── Makefile                   # demo / test / live / clean / format / lint
+├── pyproject.toml             # hatchling build, uv sync target
+├── uv.lock                    # deterministic dependency lockfile
+│
+├── src/dope/                  # Package source
+│   ├── cli/main.py            # CLI entry point (argparse)
+│   ├── core/
+│   │   ├── graph.py           # PurePyGraph — pure-Python graph engine
+│   │   ├── kuzu_backend.py    # Kùzu backend + factory function
+│   │   ├── freshness.py       # Business-day staleness logic
+│   │   ├── plugin.py          # PipelinePlugin base class
+│   │   └── schema.py          # NodeType enum, EdgeType, CYPHER_DDL
+│   ├── plugins/
+│   │   ├── fivetran.py        # Fivetran snapshot ingestion
+│   │   └── dbt.py             # dbt manifest + run-results ingestion
+│   └── query/
+│       ├── lineage.py         # Seeded walk — full downstream traversal
+│       ├── freshness_report.py# Staleness report generator (CSV)
+│       └── viz.py             # Cytoscape.js HTML visualizer
+│
+├── data/snapshots/            # Demo fixtures (CSV + JSON)
+│   ├── fivetran_connections.csv
+│   ├── fivetran_schemas.csv
+│   ├── fivetran_dbt_bridge.csv
+│   ├── dbt_nodes.json
+│   └── dbt_run_results.json
+│
+├── scripts/                   # Demo & utility scripts
+│   ├── run_demo.py            # Full pipeline: ingest → walk → report → viz
+│   ├── seed_walk_demo.py      # Minimal 4-line lineage walkthrough
+│   └── export_snapshots.py    # Live API snapshot exporter (requires credentials)
+│
+├── tests/                     # pytest suite
+│   ├── test_graph.py          # PurePyGraph correctness
+│   ├── test_lineage.py        # Seeded walk coverage
+│   ├── test_freshness.py      # Business-day edge cases
+│   ├── test_plugins.py        # Plugin ingestion logic
+│   └── smoke_test_plugins.py  # Quick sanity checks
+│
+└── docs/                      # Deep-dive architecture docs
+    ├── BUILD_DIRECTIVE.md     # Project spec + acceptance criteria
+    ├── ARCHITECTURE.md        # System design & data flow
+    └── FRESHNESS_RULE.md      # Staleness calculation specification
+```
+
+---
+
+## &nbsp;&#127990;&nbsp; Testing
+
+```sh
+# Run full suite
+make test
+# or: uv run pytest tests/ -v
+
+# Run with coverage (if you add the plugin)
+uv run pytest tests/ --cov=dope --cov-report=term-missing
+```
+
+---
+
+## &nbsp;&#127891;&nbsp; Contributing
+
+This is an indie research project — contributions are welcome in any form:
+
+- **Bug reports** and feature requests via GitHub Issues
+- **Pull requests** for plugins, bug fixes, or documentation
+- **Questions** about the architecture (I write detailed docs)
+
+Please ensure `make lint` and `make test` pass before submitting. Code style is enforced by [Ruff](https://docs.astral.sh/ruff/) with mypy type checking.
+
+---
+
+## &nbsp;&#128222;&nbsp; License
+
+MIT License — see [`LICENSE`](LICENSE) for the full text.
+
+> Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction.
+
+In other words: **take it, break it, ship it, be dope about it.**
+
+---
+
+<div align="center">
+
+&#127744; &nbsp;Built with obsession, curiosity, and too much caffeine&nbsp; &#127744;
+
+[![][back-to-top]](#top) · [GitHub](https://github.com/dvandagriff/DopeData)
 
 </div>
 
-
 [back-to-top]: https://img.shields.io/badge/-BACK_TO_TOP-151515?style=flat-square
-
-
----
