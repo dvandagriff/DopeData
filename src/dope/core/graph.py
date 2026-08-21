@@ -25,20 +25,6 @@ from typing import Any, Protocol
 logger = logging.getLogger(__name__)
 
 
-def _parse_edge_spec(spec: str) -> tuple[str, str | None]:
-    """Parse an edge spec string like 'r' or 'r:DEPENDS_ON'.
-
-    Returns (alias, rel_type) — rel_type may be None.
-    """
-    spec = spec.strip()
-    if not spec:
-        return "", None
-    if ":" in spec:
-        parts = spec.split(":", 1)
-        return parts[0].strip(), parts[1].strip()
-    return spec, None
-
-
 class GraphStore(Protocol):
     """Protocol that all graph backends must implement."""
 
@@ -169,9 +155,9 @@ class PurePyGraph:
             r"(?i)"
             r"MATCH\s+"
             r"\((\w+)(?:\s*:\s*(\w+?))?\)\s*"
-            r"\[([^\]]*?)\]\s*->\s*"
+            r"\[(\w+)\s*:\s*(\w+?)?\]\s*->\s*"
             r"\((\w+)(?:\s*:\s*(\w+?))?\)\s*"
-            r"\[([^\]]*?)\]\s*->\s*"
+            r"\[(\w+)\s*:\s*(\w+?)?\]\s*->\s*"
             r"\((\w+)(?:\s*:\s*(\w+?))?\)"
             r"(?:\s+WHERE\s+(.+?))?"
             r"(?:\s+RETURN\s+(.+))?",
@@ -185,7 +171,7 @@ class PurePyGraph:
             r"(?i)"
             r"MATCH\s+"
             r"\((\w+)(?:\s*:\s*(\w+?))?\)\s*"
-            r"\[([^\]]*?)\]\s*->\s*"
+            r"\[(\w+)\s*:\s*(\w+?)?\]\s*->\s*"
             r"\((\w+)(?:\s*:\s*(\w+?))?\)"
             r"(?:\s+WHERE\s+(.+?))?"
             r"(?:\s+RETURN\s+(.+))?",
@@ -340,9 +326,16 @@ class PurePyGraph:
         return None
 
     def _resolve_aliases(
-        self, names_spec: str, aliases: list[str], records: list[dict]
+        self, names_spec: str | None, aliases: list[str], records: list[dict]
     ) -> list[dict]:
         """Filter each row to only the requested RETURN columns."""
+        if names_spec is None:
+            # No RETURN spec → return full record
+            rows: list[dict] = []
+            for record in records:
+                rows.append(dict(record))
+            return rows
+
         tokens = [t.strip() for t in names_spec.split(",")]
         rows: list[dict] = []
         for record in records:
@@ -390,17 +383,15 @@ class PurePyGraph:
     def _query_edge(
         self, match: re.Match, params: dict[str, Any]
     ) -> list[dict]:
-        """Shape 2: MATCH (a)-[r:REL]->(b) RETURN a, r, b."""
+        """Shape 2: MATCH (a)-[r]->(b) RETURN a, r, b."""
         a_alias = match.group(1)
         a_type = match.group(2)
-        r_spec = match.group(3) or ""
-        b_alias = match.group(4)
-        b_type = match.group(5)
-        where_str = match.group(6)
-        return_spec = match.group(7)
-
-        # Parse edge spec: could be just alias ("r") or alias:type ("r:DEPENDS_ON")
-        r_alias, r_type = _parse_edge_spec(r_spec)
+        r_alias = match.group(3)
+        r_type = match.group(4)  # may be None
+        b_alias = match.group(5)
+        b_type = match.group(6)
+        where_str = match.group(7)
+        return_spec = match.group(8)
 
         aliases = {a_alias, r_alias, b_alias}
         predicate = self._where_filter(where_str, aliases, params) if where_str else lambda r: True
@@ -434,18 +425,16 @@ class PurePyGraph:
         """Shape 3: MATCH (a)-[r]->(b)-[s]->(c) RETURN a, b, c."""
         a_alias = match.group(1)
         a_type = match.group(2)
-        r_spec = match.group(3) or ""
-        b_alias = match.group(4)
-        b_type = match.group(5)
-        s_spec = match.group(6) or ""
-        c_alias = match.group(7)
-        c_type = match.group(8)
-        where_str = match.group(9)
-        return_spec = match.group(10)
-
-        # Parse edge specs: each is either just alias or alias:type
-        r_alias, r_type = _parse_edge_spec(r_spec)
-        s_alias, s_type = _parse_edge_spec(s_spec)
+        r_alias = match.group(3)
+        r_type = match.group(4)  # may be None
+        b_alias = match.group(5)
+        b_type = match.group(6)
+        s_alias = match.group(7)
+        s_type = match.group(8)  # may be None
+        c_alias = match.group(9)
+        c_type = match.group(10)
+        where_str = match.group(11)
+        return_spec = match.group(12)
 
         aliases = {a_alias, r_alias, b_alias, s_alias, c_alias}
         predicate = self._where_filter(where_str, aliases, params) if where_str else lambda r: True
