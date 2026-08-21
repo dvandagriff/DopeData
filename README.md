@@ -139,53 +139,21 @@ sequenceDiagram
 The entire data pipeline is modeled as a directed graph. Six node types and six edge types capture the full Fivetran &rarr; dbt flow:
 
 ```mermaid
-erDiagram
-    FivetranConnection {
-        string id PK
-        string source_id
-        string name
-        string status
-        timestamp synced_at
-    }
-    SnowflakeTable {
-        string id PK
-        string database
-        string schema_name
-        string table_name
-        int64 row_count
-    }
-    dbtModel {
-        string id PK
-        string package_name
-        string name
-        string type
-        string materialization
-    }
-    dbtTest {
-        string id PK
-        string model_id
-        string name
-        string status
-    }
-    dbtSource {
-        string id PK
-        string package_name
-        string name
-        string database
-        string schema_name
-    }
-    DataProduct {
-        string id PK
-        string name
-        string description
-    }
+flowchart LR
+    FC[Fivetran Connection]
+    ST[Snowflake Table]
+    DM[dbt Model]
+    DT[dbt Test]
+    DS[dbt Source]
+    DP[Data Product]
 
-    FivetranConnection ||--|o SYNC_TO : syncs to SnowflakeTable
-    SnowflakeTable ||--|o FEEDS : feeds DataProduct
-    dbtModel ||--|o DEPENDS_ON : depends on dbtModel
-    dbtModel ||--|o PRODUCES : produces SnowflakeTable
-    dbtTest ||--|o TESTS : tests dbtModel
-    DataProduct ||--|o EXPOSED_BY : exposed by dbtModel
+    FC -->|SYNC_TO| ST
+    ST -->|FEEDS| DP
+    DM -->|DEPENDS_ON| DM
+    DM -->|PRODUCES| ST
+    DT -->|TESTS| DM
+    DS -->|PRODUCES| ST
+    DP -->|EXPOSED_BY| DM
 ```
 
 <details>
