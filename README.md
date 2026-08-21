@@ -3,7 +3,7 @@
 <!-- HEADER STYLE: CLASSIC -->
 <div align="center">
 
-<img src="readmeai/assets/logos/purple.svg" width="30%" style="position: relative; top: 0; right: 0;" alt="Project Logo"/>
+<img src=".github/images/icon.jpg" width="30%" style="position: relative; top: 0; right: 0;" alt="Project Logo"/>
 
 # ❯ Data Observatory - Pipeline Observability
 
@@ -37,10 +37,6 @@ Built with the tools and technologies:
     - [Installation](#installation)
     - [Usage](#usage)
     - [Testing](#testing)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
 
 ---
 
