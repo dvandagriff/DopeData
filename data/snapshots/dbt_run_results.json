@@ -1,0 +1,114 @@
+[
+  {
+    "unique_id": "model.myproj.stg_orders",
+    "status": "success",
+    "started_at": "2026-08-14T02:00:00Z",
+    "finished_at": "2026-08-14T02:00:15Z",
+    "execution_time": 15.23
+  },
+  {
+    "unique_id": "model.myproj.stg_customers",
+    "status": "success",
+    "started_at": "2026-08-14T02:00:00Z",
+    "finished_at": "2026-08-14T02:00:18Z",
+    "execution_time": 18.05
+  },
+  {
+    "unique_id": "model.myproj.stg_random_words",
+    "status": "success",
+    "started_at": "2026-08-14T02:01:00Z",
+    "finished_at": "2026-08-14T02:01:10Z",
+    "execution_time": 10.12
+  },
+  {
+    "unique_id": "model.myproj.stg_stripe_events",
+    "status": "success",
+    "started_at": "2026-08-14T02:01:30Z",
+    "finished_at": "2026-08-14T02:01:45Z",
+    "execution_time": 15.67
+  },
+  {
+    "unique_id": "model.myproj.stg_stripe_invoices",
+    "status": "success",
+    "started_at": "2026-08-14T02:01:45Z",
+    "finished_at": "2026-08-14T02:02:00Z",
+    "execution_time": 14.33
+  },
+  {
+    "unique_id": "model.myproj.stg_sf_opportunities",
+    "status": "success",
+    "started_at": "2026-08-14T02:02:00Z",
+    "finished_at": "2026-08-14T02:02:20Z",
+    "execution_time": 20.45
+  },
+  {
+    "unique_id": "model.myproj.stg_sf_accounts",
+    "status": "success",
+    "started_at": "2026-08-14T02:02:20Z",
+    "finished_at": "2026-08-14T02:02:35Z",
+    "execution_time": 15.89
+  },
+  {
+    "unique_id": "model.myproj.stg_sf_contacts",
+    "status": "skipped",
+    "started_at": null,
+    "finished_at": null,
+    "execution_time": 0.0
+  },
+  {
+    "unique_id": "model.myproj.int_orders",
+    "status": "success",
+    "started_at": "2026-08-14T02:03:00Z",
+    "finished_at": "2026-08-14T02:03:25Z",
+    "execution_time": 25.01
+  },
+  {
+    "unique_id": "model.myproj.int_customers",
+    "status": "success",
+    "started_at": "2026-08-14T02:03:00Z",
+    "finished_at": "2026-08-14T02:03:20Z",
+    "execution_time": 19.78
+  },
+  {
+    "unique_id": "model.myproj.int_stripe_revenue",
+    "status": "success",
+    "started_at": "2026-08-14T02:03:30Z",
+    "finished_at": "2026-08-14T02:03:55Z",
+    "execution_time": 24.90
+  },
+  {
+    "unique_id": "model.myproj.fct_orders",
+    "status": "success",
+    "started_at": "2026-08-14T02:04:30Z",
+    "finished_at": "2026-08-14T02:06:10Z",
+    "execution_time": 100.55
+  },
+  {
+    "unique_id": "model.myproj.dim_products",
+    "status": "success",
+    "started_at": "2026-08-14T02:06:30Z",
+    "finished_at": "2026-08-14T02:07:45Z",
+    "execution_time": 75.32
+  },
+  {
+    "unique_id": "model.myproj.fct_stripe_revenue",
+    "status": "error",
+    "started_at": "2026-08-14T02:07:00Z",
+    "finished_at": "2026-08-14T02:07:12Z",
+    "execution_time": 12.04
+  },
+  {
+    "unique_id": "test.myproj.not_null_orders_id",
+    "status": "pass",
+    "started_at": "2026-08-14T02:08:00Z",
+    "finished_at": "2026-08-14T02:08:05Z",
+    "execution_time": 5.12
+  },
+  {
+    "unique_id": "test.myproj.unique_orders_id",
+    "status": "fail",
+    "started_at": "2026-08-14T02:08:10Z",
+    "finished_at": "2026-08-14T02:08:15Z",
+    "execution_time": 5.67
+  }
+]

@@ -1,0 +1,7 @@
+connector_id,table_schema,table_name
+random_words,fivetran_random_words,words
+stripe,fivetran_stripe,charges
+stripe,fivetran_stripe,invoices
+salesforce,fivetran_sf,opportunities
+salesforce,fivetran_sf,accounts
+salesforce,fivetran_sf,contacts

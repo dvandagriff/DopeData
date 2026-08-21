@@ -1,0 +1,8 @@
+id,type,freshness,stale,name,row_count
+conn_001,FivetranConnection,,false,stripe_payments,
+conn_002,FivetranConnection,,false,salesforce_contacts,
+conn_001.public.table_conn_001,SnowflakeTable,2026-08-20,true,table_conn_001,150000
+conn_002.public.table_conn_002,SnowflakeTable,2026-08-20,true,table_conn_002,50000
+model.my_project.orders,dbtModel,2026-08-20,true,orders,
+source.my_project.public.table_conn_001,dbtSource,,true,table_conn_001,
+test.my_project.orders_not_null.id,dbtTest,2026-08-20,true,not_null_id,

@@ -1,0 +1,7 @@
+connector_id,table_schema,table_name,dbt_unique_id
+random_words,fivetran_random_words,words,model.myproj.stg_random_words
+stripe,fivetran_stripe,charges,model.myproj.stg_stripe_events
+stripe,fivetran_stripe,invoices,model.myproj.stg_stripe_invoices
+salesforce,fivetran_sf,opportunities,model.myproj.stg_sf_opportunities
+salesforce,fivetran_sf,accounts,model.myproj.stg_sf_accounts
+salesforce,fivetran_sf,contacts,model.myproj.stg_sf_contacts

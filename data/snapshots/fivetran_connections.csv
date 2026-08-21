@@ -1,0 +1,4 @@
+connector_id,name,status,last_sync_start,last_sync_end,rows_synced
+random_words,Random Words,active,2026-08-14T08:00:00Z,2026-08-14T08:03:12Z,4821
+stripe,Stripe Billing,active,2026-08-14T06:00:00Z,2026-08-14T06:47:05Z,12043
+salesforce,SFDC CRM,active,2026-08-12T02:00:00Z,2026-08-12T02:31:00Z,889

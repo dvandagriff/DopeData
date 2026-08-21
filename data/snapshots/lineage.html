@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Pipeline Lineage &amp; Freshness</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #e2e8f0; }
+  header { padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; background: #1e293b; border-bottom: 1px solid #334155; }
+  header h1 { font-size: 1.25rem; font-weight: 600; }
+  header .meta { font-size: 0.8rem; color: #94a3b8; }
+  #cy { width: 100%; height: calc(100vh - 100px); background: #0f172a; }
+  footer { padding: 12px 24px; text-align: center; font-size: 0.75rem; color: #64748b; border-top: 1px solid #334155; background: #1e293b; }
+  .legend { position: absolute; top: 16px; left: 16px; background: rgba(30,41,59,0.95); border-radius: 8px; padding: 12px 16px; font-size: 0.8rem; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .legend h3 { margin-bottom: 8px; color: #f1f5f9; font-size: 0.85rem; }
+  .legend-item { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Pipeline Lineage &amp; Freshness</h1>
+  <span class="meta">Generated: 2026-08-21 01:09 UTC &middot; Nodes: 4</span>
+</header>
+
+<div id="cy"></div>
+
+<div class="legend">
+  <h3>Legend</h3>
+  <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>Fresh</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Stale</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#9ca3af"></div>No run data</div>
+  <hr style="border-color: #334155; margin: 6px 0;"/>
+  <div style="font-size:0.7rem;color:#94a3b8">Click a node to highlight its neighbors.</div>
+</div>
+
+<footer>
+  Dope &middot; MIT Licensed
+</footer>
+
+<script>
+var elements = {"nodes": [{"data": {"id": "conn_001", "type": "Connection", "name": "stripe_payments", "node_type": "FivetranConnection", "stale": null, "fill_color": "#9ca3af", "font_size": "38", "label": "stripe_payments"}}, {"data": {"id": "conn_001.public.table_conn_001", "type": "Table", "name": "table_conn_001", "node_type": "SnowflakeTable", "stale": true, "fill_color": "#ef4444", "font_size": "28", "label": "table_conn_001"}}, {"data": {"id": "model.my_project.orders", "type": "Model", "name": "orders", "node_type": "dbtModel", "stale": true, "fill_color": "#ef4444", "font_size": "42", "label": "orders"}}, {"data": {"id": "test.my_project.orders_not_null.id", "type": "Test", "name": "not_null_id", "node_type": "dbtTest", "stale": true, "fill_color": "#ef4444", "font_size": "18", "label": "not_null_id"}}], "edges": [{"data": {"id": "SYNC_TO-conn_001-conn_001.public.table_conn_001", "source": "conn_001", "target": "conn_001.public.table_conn_001", "type": "SYNC_TO"}}, {"data": {"id": "PRODUCES-model.my_project.orders-conn_001.public.table_conn_001", "source": "model.my_project.orders", "target": "conn_001.public.table_conn_001", "type": "PRODUCES"}}, {"data": {"id": "TESTS-test.my_project.orders_not_null.id-model.my_project.orders", "source": "test.my_project.orders_not_null.id", "target": "model.my_project.orders", "type": "TESTS"}}]};
+
+var cy = cytoscape({{
+  container: document.getElementById("cy"),
+  elements: elements,
+  style: [
+    {
+      selector: "node",
+      style: {
+        "label": "data(label)",
+        "background-color": "data(fill_color)",
+        "width": "mapData(font_size, 18, 42)",
+        "height": "mapData(font_size, 18, 42)",
+        "font-size": "10px",
+        "color": "#f1f5f9",
+        "text-halign": "center",
+        "text-valign": "center",
+        "text-outline-width": 2,
+        "text-outline-color": "#0f172a"
+      }
+    },
+    {
+      selector: "node[type='Model']",
+      style: { "shape": "ellipse", "border-width": 2, "border-color": "#3b82f6" }
+    },
+    {
+      selector: "node[type='Connection']",
+      style: { "shape": "hexagon", "border-width": 2, "border-color": "#a78bfa" }
+    },
+    {
+      selector: "node[type='Table']",
+      style: { "shape": "round-rectangle", "border-width": 1, "border-color": "#475569" }
+    },
+    {
+      selector: "node[type='Product']",
+      style: { "shape": "diamond", "border-width": 2, "border-color": "#f59e0b" }
+    },
+    {
+      selector: "edge",
+      style: {
+        "width": 1.5,
+        "line-color": "#475569",
+        "target-arrow-color": "#475569",
+        "target-arrow-shape": "triangle",
+        "curve-style": "bezier"
+      }
+    },
+    {
+      selector: ":selected",
+      style: { "border-width": 3, "border-color": "#fbbf24" }
+    },
+    {
+      selector: ".highlighted",
+      style: {
+        "line-color": "#fbbf24",
+        "target-arrow-color": "#fbbf24",
+        "background-color": "#fbbf24",
+        "border-color": "#fbbf24"
+      }
+    },
+    {
+      selector: ".dimmed",
+      style: { "opacity": 0.15 }
+    }
+  ],
+  layout: {
+    name: "cose",
+    idealEdgeLength: 60,
+    nodeOverlap: 20,
+    refresh: 20,
+    fit: true,
+    padding: 30,
+    randomize: false,
+    componentSpacing: 80,
+    nodeRepulsion: 450000
+  },
+  zoomingEnabled: true,
+  userZoomingEnabled: true,
+  panningEnabled: true,
+  userPanningEnabled: true,
+  boxSelectionEnabled: true,
+  selectionType: "single"
+});
+
+cy.on("tap", "node", function(evt) {
+  var node = evt.target;
+  cy.elements().removeClass("highlighted dimmed");
+  if (node.isSource() || node.isTarget()) {
+    var neighbourhood = node.neighborhood();
+    neighbourhood.addClass("highlighted");
+    var allOthers = cy.elements().difference(neighbourhood);
+    allOthers.addClass("dimmed");
+  } else {
+    node.addClass("highlighted");
+  }
+});
+
+cy.on("tap", function(evt) {
+  if (evt.target === cy) {
+    cy.elements().removeClass("highlighted dimmed").unselectify();
+  }
+});
+</script>
+
+</body>
+</html>
