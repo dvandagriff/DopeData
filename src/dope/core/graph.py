@@ -154,12 +154,10 @@ class PurePyGraph:
         match_two_hop = re.match(
             r"(?i)"
             r"MATCH\s+"
-            r"\((\w+)(?:\s*:\s*(\w+?))?\)\s*"
-            r"\[(\w+)\s*:\s*(\w+?)?\]\s*->\s*"
-            r"\((\w+)(?:\s*:\s*(\w+?))?\)\s*"
-            r"\[(\w+)\s*:\s*(\w+?)?\]\s*->\s*"
-            r"\((\w+)(?:\s*:\s*(\w+?))?\)"
-            r"(?:\s+WHERE\s+(.+?))?"
+            r"\((\w+)(?::\s*(\w+))?\)\-\[\s*(\w+)?:?(\w+)?\]?\s*->\s*"
+            r"\((\w+)(?::\s*(\w+))?\)\-\[\s*(\w+)?:?(\w+)?\]?\s*->\s*"
+            r"\((\w+)(?::\s*(\w+))?\)"
+            r"(?:\s+WHERE\s+(.*?)(?=\s+RETURN|$))?"
             r"(?:\s+RETURN\s+(.+))?",
             cypher,
         )
@@ -170,10 +168,9 @@ class PurePyGraph:
         match_edge = re.match(
             r"(?i)"
             r"MATCH\s+"
-            r"\((\w+)(?:\s*:\s*(\w+?))?\)\s*"
-            r"\[(\w+)\s*:\s*(\w+?)?\]\s*->\s*"
-            r"\((\w+)(?:\s*:\s*(\w+?))?\)"
-            r"(?:\s+WHERE\s+(.+?))?"
+            r"\((\w+)(?::\s*(\w+))?\)\-\[\s*(\w+)?:?(\w+)?\]?\s*->\s*"
+            r"\((\w+)(?::\s*(\w+))?\)"
+            r"(?:\s+WHERE\s+(.*?)(?=\s+RETURN|$))?"
             r"(?:\s+RETURN\s+(.+))?",
             cypher,
         )
@@ -184,8 +181,8 @@ class PurePyGraph:
         match_node = re.match(
             r"(?i)"
             r"MATCH\s+"
-            r"\((\w+)(?:\s*:\s*(\w+?))?\)"
-            r"(?:\s+WHERE\s+(.+?))?"
+            r"\((\w+)(?::\s*(\w+))?\)"
+            r"(?:\s+WHERE\s+(.*?)(?=\s+RETURN|$))?"
             r"(?:\s+RETURN\s+(.+))?",
             cypher,
         )

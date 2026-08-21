@@ -133,6 +133,9 @@ class DbtPlugin(PipelinePlugin):
                 val = manifest.get(key)
                 if isinstance(val, list):
                     nodes_data.extend(val)
+            # Fallback: manifest may be a {unique_id: node_dict} mapping
+            if not nodes_data:
+                nodes_data = list(manifest.values())
 
         # Also grab exposures separately
         exposure_data: list[dict[str, Any]] = []
