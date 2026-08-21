@@ -180,12 +180,12 @@ erDiagram
         string description
     }
 
-    FivetranConnection ||--o{ SYNC_TO : syncs to
-    SnowflakeTable ||--o{ FEEDS : feeds
-    dbtModel ||--o{ DEPENDS_ON : depends on
-    dbtModel ||--o{ PRODUCES : produces
-    dbtTest ||--o{ TESTS : tests
-    DataProduct ||--o{ EXPOSED_BY : exposed by
+    FivetranConnection ||--|o SYNC_TO : syncs to SnowflakeTable
+    SnowflakeTable ||--|o FEEDS : feeds DataProduct
+    dbtModel ||--|o DEPENDS_ON : depends on dbtModel
+    dbtModel ||--|o PRODUCES : produces SnowflakeTable
+    dbtTest ||--|o TESTS : tests dbtModel
+    DataProduct ||--|o EXPOSED_BY : exposed by dbtModel
 ```
 
 <details>
