@@ -114,7 +114,10 @@ def is_stale(
         last_date = last_run_end
 
     as_of_date = _to_date(as_of)
-    last_biz = last_business_day(as_of_date, holidays)
+    # Walk back one day so that Monday check uses Friday's data
+    # (no ETL runs on weekends, so last available data is Fri).
+    as_of_for_biz = as_of_date - _ONE_DAY
+    last_biz = last_business_day(as_of_for_biz, holidays)
 
     return last_date < last_biz
 

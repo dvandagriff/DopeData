@@ -67,6 +67,7 @@ class DbtPlugin(PipelinePlugin):
         **kwargs: Any,
     ) -> int:
         snap_dir = kwargs.get("snapshot_dir") or self.snapshot_dir or _resolve_snapshot_dir()
+        node_types_filter: list[str] | None = kwargs.get("node_types")
 
         if mode == "live":
             try:
@@ -75,14 +76,14 @@ class DbtPlugin(PipelinePlugin):
                 logger.warning(
                     "Live ingestion failed (%s), falling back to snapshot mode.", exc
                 )
-                return self._ingest_snapshot(store, snap_dir)
+                return self._ingest_snapshot(store, snap_dir, node_types_filter=node_types_filter)
 
-        return self._ingest_snapshot(store, snap_dir)
+        return self._ingest_snapshot(store, snap_dir, node_types_filter=node_types_filter)
 
     # ── snapshot mode ───────────────────────────────────────────────────
 
     def _ingest_snapshot(
-        self, store: GraphStore, snapshot_dir: pathlib.Path
+        self, store: GraphStore, snapshot_dir: pathlib.Path, *, node_types_filter: list[str] | None = None
     ) -> int:
         """Read manifest and run-result JSON files and build the graph."""
         manifest_path = snapshot_dir / "dbt_nodes.json"
@@ -154,6 +155,10 @@ class DbtPlugin(PipelinePlugin):
                 continue
 
             resource_type = (node.get("resource_type") or "").lower()
+
+            # Filter by requested node types if specified
+            if node_types_filter and resource_type not in node_types_filter:
+                continue
             name = node.get("name", uid)
             package_name = node.get("package_name", "")
             depends_on_nodes: list[str] = []

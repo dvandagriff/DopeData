@@ -25,6 +25,20 @@ from typing import Any, Protocol
 logger = logging.getLogger(__name__)
 
 
+def _parse_edge_spec(spec: str) -> tuple[str, str | None]:
+    """Parse an edge spec string like 'r' or 'r:DEPENDS_ON'.
+
+    Returns (alias, rel_type) — rel_type may be None.
+    """
+    spec = spec.strip()
+    if not spec:
+        return "", None
+    if ":" in spec:
+        parts = spec.split(":", 1)
+        return parts[0].strip(), parts[1].strip()
+    return spec, None
+
+
 class GraphStore(Protocol):
     """Protocol that all graph backends must implement."""
 
@@ -142,7 +156,7 @@ class PurePyGraph:
         1. ``MATCH (n:Type) RETURN n``
         2. ``MATCH (a)-[r:REL]->(b) RETURN a, r, b``
         3. ``MATCH (a)-[r:REL]->(b)-[s:REL]->(c) RETURN a, b, c``
-        4. Where-clause filters on the above shapes
+        Where-clause filters on the above shapes
 
         Returns a list of dicts with keys matching the RETURN variables.
         """
@@ -154,11 +168,11 @@ class PurePyGraph:
         match_two_hop = re.match(
             r"(?i)"
             r"MATCH\s+"
-            r"\((\w+)\s*:\s*(\w+?)\)\s*"
-            r"\[\s*(\w+)\s*:\s*(\w+?)\]\s*->\s*"
-            r"\((\w+)\s*:\s*(\w+?)\)\s*"
-            r"\[\s*(\w+)\s*:\s*(\w+?)\]\s*->\s*"
-            r"\((\w+)\s*:\s*(\w+?)\)"
+            r"\((\w+)(?:\s*:\s*(\w+?))?\)\s*"
+            r"\[([^\]]*?)\]\s*->\s*"
+            r"\((\w+)(?:\s*:\s*(\w+?))?\)\s*"
+            r"\[([^\]]*?)\]\s*->\s*"
+            r"\((\w+)(?:\s*:\s*(\w+?))?\)"
             r"(?:\s+WHERE\s+(.+?))?"
             r"(?:\s+RETURN\s+(.+))?",
             cypher,
@@ -166,13 +180,13 @@ class PurePyGraph:
         if match_two_hop:
             return self._query_two_hop(match_two_hop, params)
 
-        # Shape 2: single edge (a)-[r]->(b)
+        # Shape 2: single edge (a)-[r]->(b) — both with and without type specs
         match_edge = re.match(
             r"(?i)"
             r"MATCH\s+"
-            r"\((\w+)\s*:\s*(\w+?)\)\s*"
-            r"\[\s*(\w+)\s*:\s*(\w+?)\]\s*->\s*"
-            r"\((\w+)\s*:\s*(\w+?)\)"
+            r"\((\w+)(?:\s*:\s*(\w+?))?\)\s*"
+            r"\[([^\]]*?)\]\s*->\s*"
+            r"\((\w+)(?:\s*:\s*(\w+?))?\)"
             r"(?:\s+WHERE\s+(.+?))?"
             r"(?:\s+RETURN\s+(.+))?",
             cypher,
@@ -180,11 +194,11 @@ class PurePyGraph:
         if match_edge:
             return self._query_edge(match_edge, params)
 
-        # Shape 1: single node (n:Type)
+        # Shape 1: single node (n:Type) or just (n)
         match_node = re.match(
             r"(?i)"
             r"MATCH\s+"
-            r"\((\w+)\s*:\s*(\w+?)\)"
+            r"\((\w+)(?:\s*:\s*(\w+?))?\)"
             r"(?:\s+WHERE\s+(.+?))?"
             r"(?:\s+RETURN\s+(.+))?",
             cypher,
@@ -336,13 +350,17 @@ class PurePyGraph:
             for token in tokens:
                 if token == "*":
                     out.update(record)
-                else:
-                    name = token.strip()
-                    if name in record:
-                        out[name] = record[name]
-                    else:
-                        # Could be just the alias without explicit name
-                        out[name] = record.get(name)
+                elif "." in token:
+                    # Dot-notation field access: n.name → record["n"]["name"]
+                    parts = token.split(".", 1)
+                    alias, prop = parts
+                    obj = record.get(alias)
+                    if isinstance(obj, dict):
+                        val = obj.get(prop)
+                        # Use bare property name as key in output
+                        out[prop] = val
+                elif token in record:
+                    out[token] = record[token]
             rows.append(out)
         return rows
 
@@ -375,12 +393,14 @@ class PurePyGraph:
         """Shape 2: MATCH (a)-[r:REL]->(b) RETURN a, r, b."""
         a_alias = match.group(1)
         a_type = match.group(2)
-        r_alias = match.group(3)
-        r_type = match.group(4)
-        b_alias = match.group(5)
-        b_type = match.group(6)
-        where_str = match.group(7)
-        return_spec = match.group(8)
+        r_spec = match.group(3) or ""
+        b_alias = match.group(4)
+        b_type = match.group(5)
+        where_str = match.group(6)
+        return_spec = match.group(7)
+
+        # Parse edge spec: could be just alias ("r") or alias:type ("r:DEPENDS_ON")
+        r_alias, r_type = _parse_edge_spec(r_spec)
 
         aliases = {a_alias, r_alias, b_alias}
         predicate = self._where_filter(where_str, aliases, params) if where_str else lambda r: True
@@ -414,16 +434,18 @@ class PurePyGraph:
         """Shape 3: MATCH (a)-[r]->(b)-[s]->(c) RETURN a, b, c."""
         a_alias = match.group(1)
         a_type = match.group(2)
-        r_alias = match.group(3)
-        r_type = match.group(4)
-        b_alias = match.group(5)
-        b_type = match.group(6)
-        s_alias = match.group(7)
-        s_type = match.group(8)
-        c_alias = match.group(9)
-        c_type = match.group(10)
-        where_str = match.group(11)
-        return_spec = match.group(12)
+        r_spec = match.group(3) or ""
+        b_alias = match.group(4)
+        b_type = match.group(5)
+        s_spec = match.group(6) or ""
+        c_alias = match.group(7)
+        c_type = match.group(8)
+        where_str = match.group(9)
+        return_spec = match.group(10)
+
+        # Parse edge specs: each is either just alias or alias:type
+        r_alias, r_type = _parse_edge_spec(r_spec)
+        s_alias, s_type = _parse_edge_spec(s_spec)
 
         aliases = {a_alias, r_alias, b_alias, s_alias, c_alias}
         predicate = self._where_filter(where_str, aliases, params) if where_str else lambda r: True

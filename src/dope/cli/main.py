@@ -309,6 +309,12 @@ def _populate_graph_from_snapshots(graph_store: Any, snapshots_dir: Path) -> Non
     bridge_path = snapshots_dir / "fivetran_dbt_bridge.csv"
     dbt_nodes_path = snapshots_dir / "dbt_nodes.json"
 
+    if not (conns_path.exists() or dbt_nodes_path.exists()):
+        raise FileNotFoundError(
+            f"No snapshot files found in {snapshots_dir}. "
+            f"Expected at least fivetran_connections.csv or dbt_nodes.json."
+        )
+
     # Load Fivetran connections → graph nodes
     if conns_path.exists():
         for row in _load_csv(conns_path):
