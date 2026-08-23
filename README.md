@@ -6,7 +6,7 @@
 
 <div align="center">
 
-<img src=".github/images/banner.jpg" width="85%" alt="DopeData Banner"/>
+<img src="https://raw.githubusercontent.com/dvandagriff/DopeData/main/.github/images/banner.jpg" width="85%" alt="DopeData Banner"/>
 
 # DopeData
 
