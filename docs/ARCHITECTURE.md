@@ -12,7 +12,7 @@
 
 ## Graph Schema
 
-The graph stores nodes and directed edges. Node types are defined by `NodeType` in `src/dope/core/schema.py`.
+The graph stores nodes and directed edges. Node types are defined by `NodeType` in `src/dopedata/core/schema.py`.
 
 ```mermaid
 erDiagram
@@ -114,7 +114,7 @@ sequenceDiagram
 ## Directory Structure
 
 ```
-src/dope/
+src/dopedata/
 ├── __init__.py            # Package init, exports core types
 ├── cli/
 │   └── main.py            # CLI entry point (argparse-based)
@@ -139,14 +139,14 @@ docs/                      # Architecture docs
 
 ```bash
 # Run seed walk for a single connector
-python -m dope.cli.main --seed stripe
+python -m dopedata.cli.main --seed stripe
 
 # Walk all connectors, output HTML + tabular report
-python -m dope.cli.main --all-connectors --view all
+python -m dopedata.cli.main --all-connectors --view all
 
 # Override freshness date (e.g., test on Monday morning)
-python -m dope.cli.main --seed random_words --as-of 2026-08-17
+python -m dopedata.cli.main --seed random_words --as-of 2026-08-17
 
 # Use Kùzu backend for full Cypher support
-python -m dope.cli.main --seed stripe --backend kuzu
+python -m dopedata.cli.main --seed stripe --backend kuzu
 ```

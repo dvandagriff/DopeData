@@ -19,7 +19,7 @@
 
 from __future__ import annotations
 
-from dope.core.graph import GraphStore
+from dopedata.core.graph import GraphStore
 
 
 def nodes_of_type(store: GraphStore, node_type: str) -> list[dict]:

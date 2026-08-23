@@ -26,12 +26,12 @@ import os
 import pathlib
 from typing import TYPE_CHECKING, Any
 
-from dope.core.freshness import freshness_date, is_stale
-from dope.core.plugin import PipelinePlugin
-from dope.core.schema import NodeType
+from dopedata.core.freshness import freshness_date, is_stale
+from dopedata.core.plugin import PipelinePlugin
+from dopedata.core.schema import NodeType
 
 if TYPE_CHECKING:
-    from dope.core.graph import GraphStore
+    from dopedata.core.graph import GraphStore
 
 logger = logging.getLogger(__name__)
 

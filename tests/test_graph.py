@@ -23,7 +23,7 @@ import pickle
 import tempfile
 from pathlib import Path
 
-from dope.core.graph import PurePyGraph
+from dopedata.core.graph import PurePyGraph
 
 
 class TestPurePyGraphBasic:

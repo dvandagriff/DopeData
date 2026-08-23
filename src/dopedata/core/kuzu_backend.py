@@ -35,8 +35,8 @@ try:
 except ImportError:  # pragma: no cover
     KUZU_AVAILABLE = False  # type: ignore[assignment]
 
-from dope.core.graph import GraphStore
-from dope.core.schema import CYPHER_DDL
+from dopedata.core.graph import GraphStore
+from dopedata.core.schema import CYPHER_DDL
 
 logger = logging.getLogger(__name__)
 
@@ -344,7 +344,7 @@ def get_graph_store(
     recreate : Rebuild schema on construction when *backend* is ``"kuzu"``.
     """
     if backend == "purepy":
-        from dope.core.graph import PurePyGraph
+        from dopedata.core.graph import PurePyGraph
 
         return PurePyGraph()
 
@@ -360,7 +360,7 @@ def get_graph_store(
         if KUZU_AVAILABLE:
             return KuzuGraph(db_path=db_path, recreate=recreate)
         logger.info("Kùzu not available; falling back to PurePyGraph.")
-        from dope.core.graph import PurePyGraph
+        from dopedata.core.graph import PurePyGraph
 
         return PurePyGraph()
 

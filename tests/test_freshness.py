@@ -22,7 +22,7 @@ from __future__ import annotations
 import calendar
 from datetime import date, datetime
 
-from dope.core.freshness import (
+from dopedata.core.freshness import (
     US_HOLIDAYS_2026,
     freshness_date,
     is_stale,

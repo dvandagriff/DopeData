@@ -15,37 +15,16 @@
 # AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Core graph and schema infrastructure."""
+"""Plugin implementations."""
 
 from __future__ import annotations
 
-from dope.core.freshness import (  # noqa: E402
-    US_HOLIDAYS_2026,
-    freshness_date,
-    is_stale,
-    last_business_day,
-)
-from dope.core.graph import GraphStore, PurePyGraph  # noqa: E402
-from dope.core.kuzu_backend import (  # noqa: E402
-    KUZU_AVAILABLE,
-    KuzuGraph,
-    get_graph_store,
-)
-from dope.core.plugin import PipelinePlugin  # noqa: E402
-from dope.core.schema import CYPHER_DDL, EdgeType, NodeType  # noqa: E402
+from dopedata.core.plugin import PipelinePlugin  # noqa: E402
+from dopedata.plugins.dbt import DbtPlugin  # noqa: E402
+from dopedata.plugins.fivetran import FivetranPlugin  # noqa: E402
 
 __all__: list[str] = [
-    "CYPHER_DDL",
-    "EdgeType",
-    "GraphStore",
-    "KUZU_AVAILABLE",
-    "KuzuGraph",
-    "NodeType",
+    "DbtPlugin",
+    "FivetranPlugin",
     "PipelinePlugin",
-    "PurePyGraph",
-    "US_HOLIDAYS_2026",
-    "freshness_date",
-    "get_graph_store",
-    "is_stale",
-    "last_business_day",
 ]

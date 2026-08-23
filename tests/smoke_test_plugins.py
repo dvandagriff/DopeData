@@ -26,12 +26,12 @@ import pathlib
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent / "src"))
 
-from dope.core.graph import PurePyGraph
-from dope.plugins.fivetran import FivetranPlugin
-from dope.plugins.dbt import DbtPlugin
-from dope.query.lineage import seed_walk
-from dope.query.freshness_report import stale_report
-from dope.query.viz import generate_html
+from dopedata.core.graph import PurePyGraph
+from dopedata.plugins.fivetran import FivetranPlugin
+from dopedata.plugins.dbt import DbtPlugin
+from dopedata.query.lineage import seed_walk
+from dopedata.query.freshness_report import stale_report
+from dopedata.query.viz import generate_html
 
 
 def _setup_test_data(snapshot_dir: pathlib.Path) -> None:

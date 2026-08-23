@@ -29,7 +29,7 @@ mixed-technicality engineer meeting. The demo is the product.
 |---|---|
 | Python | 3.10+ (use `from __future__ import annotations` everywhere) |
 | Zero-dep demo | `make demo` must succeed with **stdlib only**. No `pip install` required. |
-| Graph backend default | **Pure-Python in-memory graph** (`dope.core.graph.GraphStore` protocol). This is the default and is the tested path. |
+| Graph backend default | **Pure-Python in-memory graph** (`dopedata.core.graph.GraphStore` protocol). This is the default and is the tested path. |
 | Graph backend optional | **Kùzu** (`pip install kuzu`, Apache 2.0, embedded single-file `.db`, no server). Wired as an optional backend behind the same `GraphStore` protocol. Guarded by a `if KUZU_AVAILABLE:` import. |
 | License | Apache 2.0. `LICENSE` file + `LICENSE_HEADER` in every `.py` file. |
 | Lint/format | `ruff` + `mypy` in `pyproject.toml`. Not required for `make demo`, but present. |
@@ -99,7 +99,7 @@ DopeData/
 
 ## 3. GRAPH SCHEMA
 
-Implement in `src/dope/core/schema.py`. The `PurePyGraph` uses plain
+Implement in `src/dopedata/core/schema.py`. The `PurePyGraph` uses plain
 Python dicts and sets. The `KuzuGraph` backend uses equivalent Cypher DDL.
 
 ### 3.1 Node Types
@@ -164,7 +164,7 @@ The PurePyGraph does NOT need DDL — it uses typed Python objects.
 Both backends implement the same GraphStore Protocol (§4).  
 
 ## 4. CORE: GraphStore Protocol + PurePyGraph  
-`src/dope/core/graph.py:`
+`src/dopedata/core/graph.py:`
 ``` python 
 from __future__ import annotations
 from typing import Protocol, Any, Iterable
@@ -210,7 +210,7 @@ verifies both conform. No ABC, no registration, no factory — structural
 typing only.  
 
 ## 5. FRESHNESS MODULE
-`src/dope/core/freshness.py:`
+`src/dopedata/core/freshness.py:`
 ``` python
 from __future__ import annotations
 from datetime import date, timedelta
@@ -260,7 +260,7 @@ Edge cases to handle and test:
 for production. Keep the demo zero-dep.
 
 ## 6. PLUGINS (Ingestion)
-`src/dope/plugins/fivetran.py` and `src/dope/plugins/dbt.py`.
+`src/dopedata/plugins/fivetran.py` and `src/dopedata/plugins/dbt.py`.
 
 Both implement `PipelinePlugin` from `core/plugin.py`:  
 ``` python
@@ -402,13 +402,13 @@ The HTML file must be **< 200KB** so it's fast to open and easy to
 share. If the graph is > 100 nodes, sample to the seed walk subtree.
 
 ## 8. CLI
-`src/dope/cli/main.py` — argparse, no `click`/`typer` (zero-dep):  
+`src/dopedata/cli/main.py` — argparse, no `click`/`typer` (zero-dep):  
 ``` bash  
-python -m dope --seed random_words --backend pure --view all
-python -m dope --seed random_words --backend kuzu  --view cypher
-python -m dope --seed random_words --backend kuzu  --view html
-python -m dope --seed random_words --mode live --backend pure
-python -m dope --all-connectors --backend pure --view csv  
+python -m dopedata --seed random_words --backend pure --view all
+python -m dopedata --seed random_words --backend kuzu  --view cypher
+python -m dopedata --seed random_words --backend kuzu  --view html
+python -m dopedata --seed random_words --mode live --backend pure
+python -m dopedata --all-connectors --backend pure --view csv  
 ```
 Args:
 
@@ -504,10 +504,10 @@ node flagged.
 
 [ ] ruff check src/ reports zero errors.
 
-[ ] mypy src/dope/ passes with no errors on the PurePyGraph
+[ ] mypy src/dopedata/ passes with no errors on the PurePyGraph
 and KuzuGraph conforming to GraphStore.
 
-[ ] python -m dope --backend kuzu --seed random_words works when
+[ ] python -m dopedata --backend kuzu --seed random_words works when
 Kùzu is installed (skip gracefully when it's not).
 
 [ ] LICENSE is the full Apache 2.0 text. Every .py file has the

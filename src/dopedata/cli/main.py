@@ -15,7 +15,7 @@
 # AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Command-line interface for dope — pipeline observability."""
+"""Command-line interface for dopedata — pipeline observability."""
 
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
-from dope.core.freshness import freshness_date, is_stale, last_business_day
+from dopedata.core.freshness import freshness_date, is_stale, last_business_day
 
 
 # ---------------------------------------------------------------------------
@@ -64,7 +64,7 @@ def seed_walk(
     connector_id :
         The Fivetran connector identifier (e.g. ``"stripe"``, ``"random_words"``).
     graph_store :
-        A :class:`dope.core.graph.GraphStore` instance already populated with
+        A :class:`dopedata.core.graph.GraphStore` instance already populated with
         Fivetran connection, schema, bridge, and dbt node data.
     snapshots_dir :
         Path to the directory containing snapshot CSV/JSON files.
@@ -268,7 +268,7 @@ def build_lineage_graph(
     else:
         snapshots_dir = Path(out_dir)
 
-    from dope.core.graph import PurePyGraph
+    from dopedata.core.graph import PurePyGraph
 
     graph_store = PurePyGraph()
 
@@ -571,7 +571,7 @@ def write_freshness_csv(report: list[dict[str, Any]], output_path: Path) -> None
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser."""
     parser = argparse.ArgumentParser(
-        prog="dope",
+        prog="dopedata",
         description="Pipeline observability — Fivetran + dbt lineage, freshness, static viz",
     )
     parser.add_argument(
@@ -647,7 +647,7 @@ def main(argv: list[str] | None = None) -> int:
             seed_id = env_seed
 
     print("=" * 72)
-    print("Dope — Pipeline Observability")
+    print("Dopedata — Pipeline Observability")
     print(f"  mode         : {args.mode}")
     print(f"  backend      : {args.backend}")
     print(f"  view         : {args.view}")

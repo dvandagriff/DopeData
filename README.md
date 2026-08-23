@@ -92,16 +92,16 @@ Expected output files appear in `data/snapshots/`:
 
 ```sh
 # Walk lineage from a specific connector
-uv run dope seed-walk --seed stripe
+dopedata seed-walk --seed stripe
 
 # Walk all connectors, output HTML + CSV report
-uv run dope scan --all-connectors --view all
+dopedata scan --all-connectors --view all
 
 # Override the "as-of" date (e.g., test Monday morning freshness)
-uv run dope scan --seed random_words --as-of 2026-08-17
+dopedata scan --seed random_words --as-of 2026-08-17
 
 # Use Kùzu backend for full Cypher queries
-uv run dope seed-walk --seed stripe --backend kuzu
+dopedata seed-walk --seed stripe --backend kuzu
 ```
 
 ---
@@ -205,8 +205,8 @@ Ingests Fivetran connector metadata and schema information from local snapshot C
 - Creates `FivetranConnection`, `SnowflakeTable` nodes and `SYNC_TO` edges
 
 ```python
-from dope.core.plugin import load_plugins
-from dope.plugins.fivetran import FivetranPlugin
+from dopedata.core.plugin import load_plugins
+from dopedata.plugins.fivetran import FivetranPlugin
 
 store = make_backend("pure")
 plugin = FivetranPlugin(snapshot_dir="data/snapshots")
@@ -225,7 +225,7 @@ Ingests dbt manifest and run-results JSON:
 - Creates `dbtModel`, `dbtTest`, `dbtSource` nodes and `DEPENDS_ON`, `TESTS`, `PRODUCES` edges
 
 ```python
-from dope.plugins.dbt import DbtPlugin
+from dopedata.plugins.dbt import DbtPlugin
 
 store = make_backend("pure")
 plugin = DbtPlugin(snapshot_dir="data/snapshots")
@@ -239,7 +239,7 @@ plugin.ingest(store, mode="snapshot")
 Subclass `PipelinePlugin` and implement the `ingest` method:
 
 ```python
-from dope.core.plugin import PipelinePlugin
+from dopedata.core.plugin import PipelinePlugin
 
 class MyCustomPlugin(PipelinePlugin):
     def ingest(self, store, mode: str = "snapshot"):
@@ -273,7 +273,7 @@ Where `LastBusinessDay` walks backwards from the reference date skipping weekend
 
 ### Configurable Holidays
 
-The 2026 US federal holidays are hardcoded in `src/dope/core/freshness.py`. For production use, swap in the [`holidays`](https://github.com/vacanza/holidays) library:
+The 2026 US federal holidays are hardcoded in `src/dopedata/core/freshness.py`. For production use, swap in the [`holidays`](https://github.com/vacanza/holidays) library:
 
 ```python
 import holidays
@@ -287,13 +287,7 @@ Full freshness specification is documented in [`docs/FRESHNESS_RULE.md`](docs/FR
 ## &nbsp;&#128193;&nbsp; Project Structure
 
 ```
-dope/
-├── LICENSE                    # MIT License (do whatever)
-├── Makefile                   # demo / test / live / clean / format / lint
-├── pyproject.toml             # hatchling build, uv sync target
-├── uv.lock                    # deterministic dependency lockfile
-│
-├── src/dope/                  # Package source
+├── src/dopedata/                  # Package source
 │   ├── cli/main.py            # CLI entry point (argparse)
 │   ├── core/
 │   │   ├── graph.py           # PurePyGraph — pure-Python graph engine

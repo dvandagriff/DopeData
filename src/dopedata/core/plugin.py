@@ -15,17 +15,41 @@
 # AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Data Observatory - Pipeline Observability"""
+"""Plugin infrastructure for pipeline data ingestion."""
 
 from __future__ import annotations
 
-__version__: str = "0.1.0"
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Any
 
-from dope.core.graph import GraphStore  # noqa: E402
-from dope.core.plugin import PipelinePlugin  # noqa: E402
+if TYPE_CHECKING:
+    from dopedata.core.graph import GraphStore
 
-__all__: list[str] = [
-    "__version__",
-    "GraphStore",
-    "PipelinePlugin",
-]
+
+class PipelinePlugin(ABC):
+    """Base class for pipeline ingestion plugins.
+
+    Subclasses implement :meth:`ingest` to load data from an external source
+    (e.g. Fivetran API, dbt manifest files) into a :class:`GraphStore`.
+    """
+
+    @abstractmethod
+    def ingest(self, store: GraphStore, mode: str = "snapshot", **kwargs: Any) -> int:
+        """Ingest data from the source into *store*.
+
+        Parameters
+        ----------
+        store :
+            The graph store to populate.
+        mode :
+            One of ``"snapshot"`` (full reload) or ``"incremental"`` (diff).
+            Defaults to ``"snapshot"``.
+        **kwargs :
+            Additional source-specific options (credentials, filters, etc.).
+
+        Returns
+        -------
+        int
+            The number of entities (nodes + edges) inserted or updated.
+        """
+        ...

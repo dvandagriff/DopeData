@@ -23,8 +23,8 @@ import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from dope.cli.main import build_lineage_graph, seed_walk
-from dope.core.graph import PurePyGraph
+from dopedata.cli.main import build_lineage_graph, seed_walk
+from dopedata.core.graph import PurePyGraph
 
 
 @pytest.fixture()

@@ -25,8 +25,8 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from dope.core.graph import PurePyGraph
-from dope.plugins import DbtPlugin, FivetranPlugin
+from dopedata.core.graph import PurePyGraph
+from dopedata.plugins import DbtPlugin, FivetranPlugin
 
 
 # ── Fixtures ───────────────────────────────────────────────────────────

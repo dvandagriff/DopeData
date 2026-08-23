@@ -62,7 +62,7 @@ Thursday Jul 2 → weekday, not a holiday → return Jul 2
 | Thanksgiving                 | Nov 26     | Thu   | —            |
 | Christmas Day                | Dec 25     | Fri   | —            |
 
-These are encoded in `src/dope/core/freshness.py` as `US_HOLIDAYS_2026`.
+These are encoded in `src/dopedata/core/freshness.py` as `US_HOLIDAYS_2026`.
 
 ## Edge Cases
 
@@ -111,5 +111,5 @@ This ensures that downstream consumers always see a meaningful date even when pi
 
 ## Code Reference
 
-- `src/dope/core/freshness.py` — `is_stale()`, `last_business_day()`, `freshness_date()`
+- `src/dopedata/core/freshness.py` — `is_stale()`, `last_business_day()`, `freshness_date()`
 - `tests/test_freshness.py` — comprehensive edge case tests
