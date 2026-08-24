@@ -30,10 +30,10 @@ from typing import Any
 
 from dopedata.core.freshness import freshness_date, is_stale, last_business_day
 
-
 # ---------------------------------------------------------------------------
 # Snapshot loaders
 # ---------------------------------------------------------------------------
+
 
 def _load_csv(path: Path) -> list[dict[str, str]]:
     """Read a CSV file and return a list of row dicts."""
@@ -50,6 +50,7 @@ def _load_json(path: Path) -> Any:
 # ---------------------------------------------------------------------------
 # Seed walk
 # ---------------------------------------------------------------------------
+
 
 def seed_walk(
     connector_id: str,
@@ -81,9 +82,13 @@ def seed_walk(
     conns_path = snapshots_dir / "fivetran_connections.csv"
 
     if not conns_path.exists():
-        raise FileNotFoundError(f"Fivetran connections snapshot not found: {conns_path}")
+        raise FileNotFoundError(
+            f"Fivetran connections snapshot not found: {conns_path}"
+        )
     if not bridge_path.exists():
-        raise FileNotFoundError(f"Fivetran-dbt bridge snapshot not found: {bridge_path}")
+        raise FileNotFoundError(
+            f"Fivetran-dbt bridge snapshot not found: {bridge_path}"
+        )
 
     conns = _load_csv(conns_path)
     bridge_rows = _load_csv(bridge_path)
@@ -148,12 +153,14 @@ def seed_walk(
     nodes_with_meta: list[dict[str, Any]] = []
     for uid in walk_nodes:
         ndata = dbt_nodes.get(uid, {})
-        nodes_with_meta.append({
-            "unique_id": uid,
-            "name": ndata.get("name", uid),
-            "resource_type": ndata.get("resource_type", "unknown"),
-            "materialized": ndata.get("config", {}).get("materialized", "unknown"),
-        })
+        nodes_with_meta.append(
+            {
+                "unique_id": uid,
+                "name": ndata.get("name", uid),
+                "resource_type": ndata.get("resource_type", "unknown"),
+                "materialized": ndata.get("config", {}).get("materialized", "unknown"),
+            }
+        )
 
     # Freshness for this connector
     last_sync_end_str = conn_record.get("last_sync_end")
@@ -161,7 +168,9 @@ def seed_walk(
     stale_flag = False
 
     if last_sync_end_str:
-        last_sync_end_dt = datetime.fromisoformat(last_sync_end_str.replace("Z", "+00:00")).replace(tzinfo=None)
+        last_sync_end_dt = datetime.fromisoformat(
+            last_sync_end_str.replace("Z", "+00:00")
+        ).replace(tzinfo=None)
         stale_flag = is_stale(last_sync_end_dt, as_of=as_of)
         freshness_date_result = freshness_date(last_sync_end_dt, as_of=as_of)
 
@@ -180,6 +189,7 @@ def seed_walk(
 # ---------------------------------------------------------------------------
 # Freshness report
 # ---------------------------------------------------------------------------
+
 
 def build_freshness_report(
     snapshots_dir: Path,
@@ -207,7 +217,9 @@ def build_freshness_report(
 
         last_date: date | None = None
         if last_sync_end_str:
-            ts = datetime.fromisoformat(last_sync_end_str.replace("Z", "+00:00")).replace(tzinfo=None)
+            ts = datetime.fromisoformat(
+                last_sync_end_str.replace("Z", "+00:00")
+            ).replace(tzinfo=None)
             last_date = ts.date()
 
         stale_flag = is_stale(last_date, as_of=as_of_date)
@@ -220,15 +232,17 @@ def build_freshness_report(
         else:
             fd = None
 
-        report.append({
-            "connector_id": connector_id,
-            "name": name,
-            "status": status,
-            "last_sync_end": last_sync_end_str or "",
-            "last_business_day": str(last_biz),
-            "freshness_date": str(fd) if fd else "",
-            "stale": stale_flag,
-        })
+        report.append(
+            {
+                "connector_id": connector_id,
+                "name": name,
+                "status": status,
+                "last_sync_end": last_sync_end_str or "",
+                "last_business_day": str(last_biz),
+                "freshness_date": str(fd) if fd else "",
+                "stale": stale_flag,
+            }
+        )
 
     return report
 
@@ -236,6 +250,7 @@ def build_freshness_report(
 # ---------------------------------------------------------------------------
 # Lineage graph builder from snapshots
 # ---------------------------------------------------------------------------
+
 
 def build_lineage_graph(
     seed_connector_id: str | None = None,
@@ -294,10 +309,12 @@ def build_lineage_graph(
             result = seed_walk(cid, graph_store, snapshots_dir, as_of=as_of)
             walk_results.append(result)
         except (ValueError, FileNotFoundError) as exc:
-            walk_results.append({
-                "connector_id": cid,
-                "error": str(exc),
-            })
+            walk_results.append(
+                {
+                    "connector_id": cid,
+                    "error": str(exc),
+                }
+            )
 
     return graph_store, walk_results
 
@@ -323,7 +340,9 @@ def _populate_graph_from_snapshots(graph_store: Any, snapshots_dir: Path) -> Non
             synced_at = None
             if last_end_str:
                 try:
-                    synced_at = datetime.fromisoformat(last_end_str.replace("Z", "+00:00"))
+                    synced_at = datetime.fromisoformat(
+                        last_end_str.replace("Z", "+00:00")
+                    )
                 except (ValueError, TypeError):
                     pass
 
@@ -391,7 +410,10 @@ def _populate_graph_from_snapshots(graph_store: Any, snapshots_dir: Path) -> Non
 # Cypher query generation
 # ---------------------------------------------------------------------------
 
-def generate_cypher_query(view_type: str, walk_result: dict[str, Any]) -> list[dict[str, str]]:
+
+def generate_cypher_query(
+    view_type: str, walk_result: dict[str, Any]
+) -> list[dict[str, str]]:
     """Generate Cypher queries and their interpretations for a seed walk result."""
     queries: list[dict[str, str]] = []
 
@@ -424,13 +446,15 @@ def generate_cypher_query(view_type: str, walk_result: dict[str, Any]) -> list[d
     if view_type in ("all", "tabular"):
         # Tabular representation of walk result
         for detail in walk_result.get("nodes_detail", []):
-            queries.append({
-                "type": "tabular_row",
-                "unique_id": detail.get("unique_id", ""),
-                "name": detail.get("name", ""),
-                "resource_type": detail.get("resource_type", ""),
-                "materialized": detail.get("materialized", ""),
-            })
+            queries.append(
+                {
+                    "type": "tabular_row",
+                    "unique_id": detail.get("unique_id", ""),
+                    "name": detail.get("name", ""),
+                    "resource_type": detail.get("resource_type", ""),
+                    "materialized": detail.get("materialized", ""),
+                }
+            )
 
     return queries
 
@@ -439,6 +463,7 @@ def generate_cypher_query(view_type: str, walk_result: dict[str, Any]) -> list[d
 # HTML lineage visualisation
 # ---------------------------------------------------------------------------
 
+
 def write_lineage_html(
     walk_results: list[dict[str, Any]],
     output_path: Path,
@@ -446,7 +471,9 @@ def write_lineage_html(
     """Write a self-contained HTML file with lineage graph info."""
     html_parts: list[str] = []
     html_parts.append("<!DOCTYPE html>")
-    html_parts.append('<html lang="en"><head><meta charset="utf-8"><title>Dope Lineage</title>')
+    html_parts.append(
+        '<html lang="en"><head><meta charset="utf-8"><title>Dope Lineage</title>'
+    )
     html_parts.append("<style>")
     html_parts.append("""
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 2rem; background: #fafafa; }
@@ -479,25 +506,35 @@ th { background: #f0f0f0; }
             stale_count += 1
 
         html_parts.append(f'<div class="connector-card">')
-        tag = ' <span class="stale-tag">STALE</span>' if is_stale_conn else ' <span class="fresh-tag">FRESH</span>'
+        tag = (
+            ' <span class="stale-tag">STALE</span>'
+            if is_stale_conn
+            else ' <span class="fresh-tag">FRESH</span>'
+        )
         html_parts.append(f"<h2>{cname} <code>{cid}</code>{tag}</h2>")
 
         last_sync = wr.get("last_sync_end", "N/A")
         fd = wr.get("freshness_date", "N/A")
-        html_parts.append(f"<p>Last sync: <code>{last_sync}</code> &nbsp;|&nbsp; Freshness date: <code>{fd}</code></p>")
+        html_parts.append(
+            f"<p>Last sync: <code>{last_sync}</code> &nbsp;|&nbsp; Freshness date: <code>{fd}</code></p>"
+        )
 
         if nodes_detail:
             total_nodes += len(nodes_detail)
             total_edges += len(wr.get("edges", []))
-            html_parts.append("<table><thead><tr>"
-                              "<th>Node</th><th>Type</th><th>Materialized</th></tr></thead><tbody>")
+            html_parts.append(
+                "<table><thead><tr>"
+                "<th>Node</th><th>Type</th><th>Materialized</th></tr></thead><tbody>"
+            )
             for nd in nodes_detail:
                 uid = nd.get("unique_id", "")
                 rtype = nd.get("resource_type", "")
                 mat = nd.get("materialized", "")
                 type_cls = f"node-type-{rtype}" if rtype else ""
-                html_parts.append(f"<tr><td class=\"{type_cls}\"><code>{uid}</code></td>"
-                                  f"<td>{rtype}</td><td>{mat}</td></tr>")
+                html_parts.append(
+                    f'<tr><td class="{type_cls}"><code>{uid}</code></td>'
+                    f"<td>{rtype}</td><td>{mat}</td></tr>"
+                )
             html_parts.append("</tbody></table>")
 
         # Edge summary
@@ -505,7 +542,9 @@ th { background: #f0f0f0; }
         if edges:
             html_parts.append(f"<p><strong>Edges ({len(edges)}):</strong></p><ul>")
             for edge in edges[:20]:  # cap display
-                html_parts.append(f"<li><code>{edge.get('from', '')}</code> → <code>{edge.get('to', '')}</code></li>")
+                html_parts.append(
+                    f"<li><code>{edge.get('from', '')}</code> → <code>{edge.get('to', '')}</code></li>"
+                )
             if len(edges) > 20:
                 html_parts.append(f"<li>… and {len(edges) - 20} more</li>")
             html_parts.append("</ul>")
@@ -526,19 +565,23 @@ th { background: #f0f0f0; }
     # Freshness report table
     freshness_report = build_freshness_report(Path("data/snapshots"))
     if freshness_report:
-        html_parts.append('<h3>All Connectors – Freshness Report</h3><table><thead><tr>'
-                          "<th>Connector</th><th>Last Sync End</th>"
-                          "<th>Last Business Day</th><th>Freshness Date</th><th>Status</th></tr></thead><tbody>")
+        html_parts.append(
+            "<h3>All Connectors – Freshness Report</h3><table><thead><tr>"
+            "<th>Connector</th><th>Last Sync End</th>"
+            "<th>Last Business Day</th><th>Freshness Date</th><th>Status</th></tr></thead><tbody>"
+        )
         for fr in freshness_report:
             status = "STALE" if fr["stale"] else "FRESH"
             tag_class = "stale-tag" if fr["stale"] else "fresh-tag"
-            html_parts.append(f"<tr>"
-                              f"<td><code>{fr['connector_id']}</code> — {fr['name']}</td>"
-                              f"<td>{fr['last_sync_end']}</td>"
-                              f"<td>{fr['last_business_day']}</td>"
-                              f"<td>{fr['freshness_date']}</td>"
-                              f"<td><span class=\"{tag_class}\">{status}</span></td>"
-                              f"</tr>")
+            html_parts.append(
+                f"<tr>"
+                f"<td><code>{fr['connector_id']}</code> — {fr['name']}</td>"
+                f"<td>{fr['last_sync_end']}</td>"
+                f"<td>{fr['last_business_day']}</td>"
+                f"<td>{fr['freshness_date']}</td>"
+                f'<td><span class="{tag_class}">{status}</span></td>'
+                f"</tr>"
+            )
         html_parts.append("</tbody></table>")
 
     html_parts.append("</body></html>")
@@ -551,6 +594,7 @@ th { background: #f0f0f0; }
 # ---------------------------------------------------------------------------
 # Freshness CSV report writer
 # ---------------------------------------------------------------------------
+
 
 def write_freshness_csv(report: list[dict[str, Any]], output_path: Path) -> None:
     """Write the freshness report to a CSV file."""
@@ -566,6 +610,7 @@ def write_freshness_csv(report: list[dict[str, Any]], output_path: Path) -> None
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser."""
@@ -635,7 +680,10 @@ def main(argv: list[str] | None = None) -> int:
         try:
             as_of_date = date.fromisoformat(args.as_of)
         except ValueError:
-            print(f"Error: invalid --as-of date '{args.as_of}' (expected YYYY-MM-DD)", file=sys.stderr)
+            print(
+                f"Error: invalid --as-of date '{args.as_of}' (expected YYYY-MM-DD)",
+                file=sys.stderr,
+            )
             return 1
 
     # Determine seed
@@ -671,7 +719,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.view in ("all", "cypher"):
         for wr in walk_results:
             if "error" in wr:
-                print(f"\n[ERROR] Connector '{wr.get('connector_id', '?')}': {wr['error']}")
+                print(
+                    f"\n[ERROR] Connector '{wr.get('connector_id', '?')}': {wr['error']}"
+                )
                 continue
             queries = generate_cypher_query(args.view, wr)
             for q in queries:
@@ -690,11 +740,15 @@ def main(argv: list[str] | None = None) -> int:
             if not nodes_detail:
                 continue
             stale_tag = " [STALE]" if wr.get("stale") else ""
-            print(f"\n--- Connector: {wr.get('name', '')} ({wr['connector_id']}){stale_tag}")
+            print(
+                f"\n--- Connector: {wr.get('name', '')} ({wr['connector_id']}){stale_tag}"
+            )
             print(f"  {'Node':<60} {'Type':<14} {'Materialized':<12}")
             print(f"  {'-'*60} {'-'*14} {'-'*12}")
             for nd in nodes_detail:
-                print(f"  {nd['unique_id']:<60} {nd['resource_type']:<14} {nd['materialized']:<12}")
+                print(
+                    f"  {nd['unique_id']:<60} {nd['resource_type']:<14} {nd['materialized']:<12}"
+                )
 
     # Write HTML output
     if args.view in ("all", "html"):
@@ -712,8 +766,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[WARN] Could not write freshness CSV: {exc}", file=sys.stderr)
 
     # Summary
-    total_nodes = sum(len(wr.get("nodes", [])) for wr in walk_results if "error" not in wr)
-    total_edges = sum(len(wr.get("edges", [])) for wr in walk_results if "error" not in wr)
+    total_nodes = sum(
+        len(wr.get("nodes", [])) for wr in walk_results if "error" not in wr
+    )
+    total_edges = sum(
+        len(wr.get("edges", [])) for wr in walk_results if "error" not in wr
+    )
     stale_count = sum(1 for wr in walk_results if wr.get("stale"))
     print(f"\n{'='*72}")
     print(f"{total_nodes} nodes, {total_edges} edges, {stale_count} stale.")

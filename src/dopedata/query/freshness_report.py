@@ -85,14 +85,16 @@ def stale_report(
         if stale_flag or stale_flag is None:
             stale_count += 1
 
-        rows.append({
-            "id": node_id,
-            "type": node_type,
-            "freshness": freshness_val or "",
-            "stale": "true" if stale_flag else "false",
-            "name": node.get("name", ""),
-            "row_count": node.get("row_count") or "",
-        })
+        rows.append(
+            {
+                "id": node_id,
+                "type": node_type,
+                "freshness": freshness_val or "",
+                "stale": "true" if stale_flag else "false",
+                "name": node.get("name", ""),
+                "row_count": node.get("row_count") or "",
+            }
+        )
 
     # Sort by type then id for consistent output
     rows.sort(key=lambda r: (r["type"], r["id"]))
@@ -107,6 +109,7 @@ def stale_report(
 
 
 # ── internal helpers ───────────────────────────────────────────────────
+
 
 def _get_all_nodes(store: GraphStore) -> list[dict[str, Any]]:
     """Retrieve all nodes from the store.
@@ -135,11 +138,18 @@ def _get_all_nodes(store: GraphStore) -> list[dict[str, Any]]:
     return []
 
 
-def _extract_last_run_end(node: dict[str, Any]) -> datetime.date | datetime.datetime | None:
+def _extract_last_run_end(
+    node: dict[str, Any],
+) -> datetime.date | datetime.datetime | None:
     """Best-effort extraction of a last-run timestamp from node properties."""
     # Try various common key names for the last run end time
-    for key in ("last_modified", "end_time", "last_sync_end", "finished_at",
-                 "loaded_at"):
+    for key in (
+        "last_modified",
+        "end_time",
+        "last_sync_end",
+        "finished_at",
+        "loaded_at",
+    ):
         val = node.get(key)
         if isinstance(val, str) and val.strip():
             try:
@@ -195,7 +205,11 @@ def _format_table(rows: list[dict[str, Any]]) -> str:
     for row in rows:
         for header, key in columns:
             val = row.get(key, "")
-            str_val = f"[STALE] {val}" if header == "STALE" and row.get("stale") == "true" else val
+            str_val = (
+                f"[STALE] {val}"
+                if header == "STALE" and row.get("stale") == "true"
+                else val
+            )
             col_widths[header] = max(col_widths[header], len(str(str_val)))
 
     # Build format string

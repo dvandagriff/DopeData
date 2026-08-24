@@ -94,7 +94,9 @@ class FivetranPlugin(PipelinePlugin):
         int
             Number of nodes created.
         """
-        snap_dir = kwargs.get("snapshot_dir") or self.snapshot_dir or _resolve_snapshot_dir()
+        snap_dir = (
+            kwargs.get("snapshot_dir") or self.snapshot_dir or _resolve_snapshot_dir()
+        )
 
         if mode == "live":
             try:
@@ -109,9 +111,7 @@ class FivetranPlugin(PipelinePlugin):
 
     # ── snapshot mode ───────────────────────────────────────────────────
 
-    def _ingest_snapshot(
-        self, store: GraphStore, snapshot_dir: pathlib.Path
-    ) -> int:
+    def _ingest_snapshot(self, store: GraphStore, snapshot_dir: pathlib.Path) -> int:
         """Read CSV files and build the graph from them."""
         connections_path = snapshot_dir / "fivetran_connections.csv"
         schemas_path = snapshot_dir / "fivetran_schemas.csv"
@@ -243,9 +243,10 @@ class FivetranPlugin(PipelinePlugin):
             for schema_row in schemas:
                 bridge_schema = bridge_row.get("table_schema", "")
                 bridge_table = bridge_row.get("table_name", "")
-                if schema_row.get("table_schema") == bridge_schema and schema_row.get(
-                    "table_name"
-                ) == bridge_table:
+                if (
+                    schema_row.get("table_schema") == bridge_schema
+                    and schema_row.get("table_name") == bridge_table
+                ):
                     table_id = f"{cid}.{bridge_schema}.{bridge_table}"
                     existing = store.node(table_id)
                     if existing and f_date:
@@ -270,7 +271,10 @@ class FivetranPlugin(PipelinePlugin):
         import base64
 
         encoded = base64.b64encode(auth_string.encode("utf-8")).decode("utf-8")
-        request_headers = {"Authorization": f"Basic {encoded}", "Content-Type": "application/json"}
+        request_headers = {
+            "Authorization": f"Basic {encoded}",
+            "Content-Type": "application/json",
+        }
 
         node_count = 0
 

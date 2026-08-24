@@ -66,7 +66,9 @@ class DbtPlugin(PipelinePlugin):
         mode: str = "snapshot",
         **kwargs: Any,
     ) -> int:
-        snap_dir = kwargs.get("snapshot_dir") or self.snapshot_dir or _resolve_snapshot_dir()
+        snap_dir = (
+            kwargs.get("snapshot_dir") or self.snapshot_dir or _resolve_snapshot_dir()
+        )
         node_types_filter: list[str] | None = kwargs.get("node_types")
 
         if mode == "live":
@@ -76,14 +78,22 @@ class DbtPlugin(PipelinePlugin):
                 logger.warning(
                     "Live ingestion failed (%s), falling back to snapshot mode.", exc
                 )
-                return self._ingest_snapshot(store, snap_dir, node_types_filter=node_types_filter)
+                return self._ingest_snapshot(
+                    store, snap_dir, node_types_filter=node_types_filter
+                )
 
-        return self._ingest_snapshot(store, snap_dir, node_types_filter=node_types_filter)
+        return self._ingest_snapshot(
+            store, snap_dir, node_types_filter=node_types_filter
+        )
 
     # ── snapshot mode ───────────────────────────────────────────────────
 
     def _ingest_snapshot(
-        self, store: GraphStore, snapshot_dir: pathlib.Path, *, node_types_filter: list[str] | None = None
+        self,
+        store: GraphStore,
+        snapshot_dir: pathlib.Path,
+        *,
+        node_types_filter: list[str] | None = None,
     ) -> int:
         """Read manifest and run-result JSON files and build the graph."""
         manifest_path = snapshot_dir / "dbt_nodes.json"
@@ -140,7 +150,9 @@ class DbtPlugin(PipelinePlugin):
         # Also grab exposures separately
         exposure_data: list[dict[str, Any]] = []
         if isinstance(manifest, dict):
-            exp_val = manifest.get("exposures") or manifest.get("data", {}).get("exposures")
+            exp_val = manifest.get("exposures") or manifest.get("data", {}).get(
+                "exposures"
+            )
             if isinstance(exp_val, dict):
                 for _k, v in exp_val.items():
                     exposure_data.append(v)
@@ -235,7 +247,11 @@ class DbtPlugin(PipelinePlugin):
                 props["stale"] = stale_flag
 
             elif node_type_str == NodeType.DBT_TEST.value:
-                test_type = node.get("test_metadata", {}).get("type", "generic") if isinstance(node.get("test_metadata"), dict) else ""
+                test_type = (
+                    node.get("test_metadata", {}).get("type", "generic")
+                    if isinstance(node.get("test_metadata"), dict)
+                    else ""
+                )
                 props["test_type"] = test_type
                 props["status"] = run_status or "unknown"
                 execution_time = rr.get("execution_time") if rr else None
@@ -259,7 +275,9 @@ class DbtPlugin(PipelinePlugin):
                 props["stale"] = stale_flag
 
             elif node_type_str == NodeType.DBT_SOURCE.value:
-                loaded_at = node.get("loaded_at") or (rr.get("finished_at") if rr else None)
+                loaded_at = node.get("loaded_at") or (
+                    rr.get("finished_at") if rr else None
+                )
                 props["loaded_at"] = loaded_at
                 if isinstance(loaded_at, str) and loaded_at:
                     try:
@@ -322,9 +340,12 @@ class DbtPlugin(PipelinePlugin):
                 continue
 
             name = exposure.get("name", exp_uid)
-            owner = exposure.get("owner", {}).get("email") or exposure.get(
-                "owner", {}
-            ).get("name") if isinstance(exposure.get("owner"), dict) else None
+            owner = (
+                exposure.get("owner", {}).get("email")
+                or exposure.get("owner", {}).get("name")
+                if isinstance(exposure.get("owner"), dict)
+                else None
+            )
             description = exposure.get("description", "")
 
             # Determine consumers from type
@@ -407,9 +428,11 @@ class DbtPlugin(PipelinePlugin):
             with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310
                 run_data = json.loads(resp.read().decode("utf-8"))
 
-            runs = run_data.get("results", {}).get("data") or run_data.get(
-                "data", {}
-            ).get("data") or []
+            runs = (
+                run_data.get("results", {}).get("data")
+                or run_data.get("data", {}).get("data")
+                or []
+            )
             if not runs:
                 return 0
 
@@ -435,9 +458,11 @@ class DbtPlugin(PipelinePlugin):
             with urllib.request.urlopen(req_steps, timeout=30) as resp:  # noqa: S310
                 step_data = json.loads(resp.read().decode("utf-8"))
 
-            steps = step_data.get("results", {}).get("data") or step_data.get(
-                "data", {}
-            ).get("data") or []
+            steps = (
+                step_data.get("results", {}).get("data")
+                or step_data.get("data", {}).get("data")
+                or []
+            )
 
             for step in steps:
                 model_name = step.get("unique_id", "") or step.get(
@@ -471,7 +496,11 @@ class DbtPlugin(PipelinePlugin):
                 store.add_node(
                     NodeType.DBT_MODEL.value,
                     uid,
-                    name=model_name.rsplit(".", 1)[-1] if "." in model_name else model_name,
+                    name=(
+                        model_name.rsplit(".", 1)[-1]
+                        if "." in model_name
+                        else model_name
+                    ),
                     package_name="dbt_cloud",
                     materialization="table",
                     start_time=start_ts,

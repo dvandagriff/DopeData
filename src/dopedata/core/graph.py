@@ -1,19 +1,22 @@
 # Copyright 2026 Drew Vandagriff
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-# documentation files (the "Software"), to deal in the Software without restriction, including without
-# limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-# the Software, and to permit persons to whom the Software is furnished to do so, subject to the following
-# conditions:
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in all copies or substantial
-# portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
-# LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO
-# EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-# AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
-# OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
 
 from __future__ import annotations
 
@@ -51,7 +54,9 @@ class GraphStore(Protocol):
 
 
 class PurePyGraph:
-    """Zero-dependency in-memory graph backed by dicts. Implements GraphStore."""
+    """Zero-dependency in-memory graph backed by dicts.
+
+    Implements GraphStore."""
 
     def __init__(self) -> None:
         self._nodes: dict[str, dict] = {}
@@ -67,9 +72,7 @@ class PurePyGraph:
         """
         self._nodes[node_id] = {"type": node_type, "id": node_id, **props}
 
-    def add_edge(
-        self, rel_type: str, from_id: str, to_id: str, **props: Any
-    ) -> None:
+    def add_edge(self, rel_type: str, from_id: str, to_id: str, **props: Any) -> None:
         """Append a directed edge to the internal list."""
         self._edges.append(
             {
@@ -245,9 +248,7 @@ class PurePyGraph:
         clause = clause.strip().rstrip(";")
 
         # Try parameter reference:  n.prop = $param
-        m_param = re.match(
-            r"(\w+)\.(\w+)\s*=\s*\$(\w+)", clause
-        )
+        m_param = re.match(r"(\w+)\.(\w+)\s*=\s*\$(\w+)", clause)
         if m_param:
             alias, prop, param_name = m_param.groups()
             value = self._get_field(alias, prop, record, aliases)
@@ -255,9 +256,7 @@ class PurePyGraph:
             return value == expected
 
         # Boolean literal:  n.stale = true  /  n.stale = false
-        m_bool = re.match(
-            r"(\w+)\.(\w+)\s*=\s*(true|false)", clause, re.IGNORECASE
-        )
+        m_bool = re.match(r"(\w+)\.(\w+)\s*=\s*(true|false)", clause, re.IGNORECASE)
         if m_bool:
             alias, prop, lit = m_bool.groups()
             value = self._get_field(alias, prop, record, aliases)
@@ -265,18 +264,14 @@ class PurePyGraph:
             return value == expected
 
         # String literal:  n.name = 'something'  (or double-quoted)
-        m_str = re.match(
-            r"(\w+)\.(\w+)\s*=\s*'([^']*)'", clause
-        )
+        m_str = re.match(r"(\w+)\.(\w+)\s*=\s*'([^']*)'", clause)
         if m_str:
             alias, prop, expected = m_str.groups()
             value = self._get_field(alias, prop, record, aliases)
             return value == expected
 
         # Numeric literal:  n.row_count > 100
-        m_cmp = re.match(
-            r"(\w+)\.(\w+)\s*([><=!]+)\s*(.+)", clause
-        )
+        m_cmp = re.match(r"(\w+)\.(\w+)\s*([><=!]+)\s*(.+)", clause)
         if m_cmp:
             alias, prop, op, operand = m_cmp.groups()
             value = self._get_field(alias, prop, record, aliases)
@@ -312,9 +307,7 @@ class PurePyGraph:
             return left <= right
         return False
 
-    def _get_field(
-        self, alias: str, prop: str, record: dict, aliases: set[str]
-    ) -> Any:
+    def _get_field(self, alias: str, prop: str, record: dict, aliases: set[str]) -> Any:
         """Pull a field value from the current MATCH record by variable alias."""
         if alias in record:
             obj = record[alias]
@@ -354,9 +347,7 @@ class PurePyGraph:
             rows.append(out)
         return rows
 
-    def _query_node(
-        self, match: re.Match, params: dict[str, Any]
-    ) -> list[dict]:
+    def _query_node(self, match: re.Match, params: dict[str, Any]) -> list[dict]:
         """Shape 1: MATCH (n:Type) RETURN ..."""
         alias = match.group(1)
         node_type = match.group(2)
@@ -364,7 +355,11 @@ class PurePyGraph:
         return_spec = match.group(4)
 
         aliases = {alias}
-        predicate = self._where_filter(where_str, aliases, params) if where_str else lambda r: True
+        predicate = (
+            self._where_filter(where_str, aliases, params)
+            if where_str
+            else lambda r: True
+        )
 
         results: list[dict] = []
         for node_id, data in self._nodes.items():
@@ -377,9 +372,7 @@ class PurePyGraph:
 
         return results
 
-    def _query_edge(
-        self, match: re.Match, params: dict[str, Any]
-    ) -> list[dict]:
+    def _query_edge(self, match: re.Match, params: dict[str, Any]) -> list[dict]:
         """Shape 2: MATCH (a)-[r]->(b) RETURN a, r, b."""
         a_alias = match.group(1)
         a_type = match.group(2)
@@ -391,7 +384,11 @@ class PurePyGraph:
         return_spec = match.group(8)
 
         aliases = {a_alias, r_alias, b_alias}
-        predicate = self._where_filter(where_str, aliases, params) if where_str else lambda r: True
+        predicate = (
+            self._where_filter(where_str, aliases, params)
+            if where_str
+            else lambda r: True
+        )
 
         results: list[dict] = []
         for edge in self._edges:
@@ -416,9 +413,7 @@ class PurePyGraph:
 
         return results
 
-    def _query_two_hop(
-        self, match: re.Match, params: dict[str, Any]
-    ) -> list[dict]:
+    def _query_two_hop(self, match: re.Match, params: dict[str, Any]) -> list[dict]:
         """Shape 3: MATCH (a)-[r]->(b)-[s]->(c) RETURN a, b, c."""
         a_alias = match.group(1)
         a_type = match.group(2)
@@ -434,7 +429,11 @@ class PurePyGraph:
         return_spec = match.group(12)
 
         aliases = {a_alias, r_alias, b_alias, s_alias, c_alias}
-        predicate = self._where_filter(where_str, aliases, params) if where_str else lambda r: True
+        predicate = (
+            self._where_filter(where_str, aliases, params)
+            if where_str
+            else lambda r: True
+        )
 
         results: list[dict] = []
         for e1 in self._edges:

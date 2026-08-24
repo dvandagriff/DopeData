@@ -33,9 +33,9 @@ logger = logging.getLogger(__name__)
 
 # ── colour constants ──────────────────────────────────────────────────
 
-_COLOR_GREEN = "#22c55e"   # fresh
-_COLOR_RED = "#ef4444"     # stale
-_COLOR_GREY = "#9ca3af"    # no run data / unknown
+_COLOR_GREEN = "#22c55e"  # fresh
+_COLOR_RED = "#ef4444"  # stale
+_COLOR_GREY = "#9ca3af"  # no run data / unknown
 
 
 def generate_html(
@@ -75,14 +75,16 @@ def generate_html(
             nodes_data.append(_normalize_node(node))
 
         for edge in raw_edges:
-            edges_data.append({
-                "data": {
-                    "id": _edge_id(edge),
-                    "source": edge.get("from_id", ""),
-                    "target": edge.get("to_id", ""),
-                    "type": edge.get("rel_type", ""),
+            edges_data.append(
+                {
+                    "data": {
+                        "id": _edge_id(edge),
+                        "source": edge.get("from_id", ""),
+                        "target": edge.get("to_id", ""),
+                        "type": edge.get("rel_type", ""),
+                    }
                 }
-            })
+            )
 
     total_nodes = len(nodes_data)
 
@@ -119,6 +121,7 @@ def generate_html(
 
 
 # ── helpers ───────────────────────────────────────────────────────────
+
 
 def _normalize_node(node: dict[str, Any]) -> dict[str, Any]:
     """Convert a raw node dict into the format expected by the HTML template."""
@@ -168,7 +171,9 @@ def _short_type_name(canonical: str) -> str:
         "dbtSource": "Source",
         "DataProduct": "Product",
     }
-    return mapping.get(canonical, canonical.split(".")[-1] if "." in canonical else canonical[:20])
+    return mapping.get(
+        canonical, canonical.split(".")[-1] if "." in canonical else canonical[:20]
+    )
 
 
 def _edge_id(edge: dict[str, Any]) -> str:
@@ -181,6 +186,7 @@ def _edge_id(edge: dict[str, Any]) -> str:
 
 # ── HTML template generation ─────────────────────────────────────────
 
+
 def _build_template(
     elements_json: str,
     timestamp: str,
@@ -189,59 +195,59 @@ def _build_template(
     """Build the full HTML string via f-string interpolation."""
 
     return (
-        '<!DOCTYPE html>\n'
+        "<!DOCTYPE html>\n"
         '<html lang="en">\n'
-        '<head>\n'
+        "<head>\n"
         '<meta charset="utf-8"/>\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1"/>\n'
-        '<title>Pipeline Lineage &amp; Freshness</title>\n'
+        "<title>Pipeline Lineage &amp; Freshness</title>\n"
         '<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>\n'
-        '<style>\n'
-        '  * { box-sizing: border-box; margin: 0; padding: 0; }\n'
+        "<style>\n"
+        "  * { box-sizing: border-box; margin: 0; padding: 0; }\n"
         '  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #e2e8f0; }\n'
-        '  header { padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; background: #1e293b; border-bottom: 1px solid #334155; }\n'
-        '  header h1 { font-size: 1.25rem; font-weight: 600; }\n'
-        '  header .meta { font-size: 0.8rem; color: #94a3b8; }\n'
-        '  #cy { width: 100%; height: calc(100vh - 100px); background: #0f172a; }\n'
-        '  footer { padding: 12px 24px; text-align: center; font-size: 0.75rem; color: #64748b; border-top: 1px solid #334155; background: #1e293b; }\n'
-        '  .legend { position: absolute; top: 16px; left: 16px; background: rgba(30,41,59,0.95); border-radius: 8px; padding: 12px 16px; font-size: 0.8rem; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }\n'
-        '  .legend h3 { margin-bottom: 8px; color: #f1f5f9; font-size: 0.85rem; }\n'
-        '  .legend-item { display: flex; align-items: center; gap: 8px; margin: 4px 0; }\n'
-        '  .legend-dot { width: 12px; height: 12px; border-radius: 50%; }\n'
-        '</style>\n'
-        '</head>\n'
-        '<body>\n'
-        '\n'
-        '<header>\n'
-        '  <h1>Pipeline Lineage &amp; Freshness</h1>\n'
+        "  header { padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; background: #1e293b; border-bottom: 1px solid #334155; }\n"
+        "  header h1 { font-size: 1.25rem; font-weight: 600; }\n"
+        "  header .meta { font-size: 0.8rem; color: #94a3b8; }\n"
+        "  #cy { width: 100%; height: calc(100vh - 100px); background: #0f172a; }\n"
+        "  footer { padding: 12px 24px; text-align: center; font-size: 0.75rem; color: #64748b; border-top: 1px solid #334155; background: #1e293b; }\n"
+        "  .legend { position: absolute; top: 16px; left: 16px; background: rgba(30,41,59,0.95); border-radius: 8px; padding: 12px 16px; font-size: 0.8rem; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }\n"
+        "  .legend h3 { margin-bottom: 8px; color: #f1f5f9; font-size: 0.85rem; }\n"
+        "  .legend-item { display: flex; align-items: center; gap: 8px; margin: 4px 0; }\n"
+        "  .legend-dot { width: 12px; height: 12px; border-radius: 50%; }\n"
+        "</style>\n"
+        "</head>\n"
+        "<body>\n"
+        "\n"
+        "<header>\n"
+        "  <h1>Pipeline Lineage &amp; Freshness</h1>\n"
         f'  <span class="meta">Generated: {timestamp} &middot; Nodes: {total_nodes}</span>\n'
-        '</header>\n'
-        '\n'
+        "</header>\n"
+        "\n"
         '<div id="cy"></div>\n'
-        '\n'
+        "\n"
         '<div class="legend">\n'
-        '  <h3>Legend</h3>\n'
+        "  <h3>Legend</h3>\n"
         f'  <div class="legend-item"><div class="legend-dot" style="background:{_COLOR_GREEN}"></div>Fresh</div>\n'
         f'  <div class="legend-item"><div class="legend-dot" style="background:{_COLOR_RED}"></div>Stale</div>\n'
         f'  <div class="legend-item"><div class="legend-dot" style="background:{_COLOR_GREY}"></div>No run data</div>\n'
         '  <hr style="border-color: #334155; margin: 6px 0;"/>\n'
         '  <div style="font-size:0.7rem;color:#94a3b8">Click a node to highlight its neighbors.</div>\n'
-        '</div>\n'
-        '\n'
-        '<footer>\n'
-        '  Dope &middot; MIT Licensed\n'
-        '</footer>\n'
-        '\n'
-        '<script>\n'
-        f'var elements = {elements_json};\n'
-        '\n'
+        "</div>\n"
+        "\n"
+        "<footer>\n"
+        "  Dope &middot; MIT Licensed\n"
+        "</footer>\n"
+        "\n"
+        "<script>\n"
+        f"var elements = {elements_json};\n"
+        "\n"
         "var cy = cytoscape({{\n"
         '  container: document.getElementById("cy"),\n'
-        '  elements: elements,\n'
-        '  style: [\n'
-        '    {\n'
+        "  elements: elements,\n"
+        "  style: [\n"
+        "    {\n"
         '      selector: "node",\n'
-        '      style: {\n'
+        "      style: {\n"
         '        "label": "data(label)",\n'
         '        "background-color": "data(fill_color)",\n'
         '        "width": "mapData(font_size, 18, 42)",\n'
@@ -252,91 +258,91 @@ def _build_template(
         '        "text-valign": "center",\n'
         '        "text-outline-width": 2,\n'
         '        "text-outline-color": "#0f172a"\n'
-        '      }\n'
-        '    },\n'
-        '    {\n'
-        '      selector: "node[type=\'Model\']",\n'
+        "      }\n"
+        "    },\n"
+        "    {\n"
+        "      selector: \"node[type='Model']\",\n"
         '      style: { "shape": "ellipse", "border-width": 2, "border-color": "#3b82f6" }\n'
-        '    },\n'
-        '    {\n'
-        '      selector: "node[type=\'Connection\']",\n'
+        "    },\n"
+        "    {\n"
+        "      selector: \"node[type='Connection']\",\n"
         '      style: { "shape": "hexagon", "border-width": 2, "border-color": "#a78bfa" }\n'
-        '    },\n'
-        '    {\n'
-        '      selector: "node[type=\'Table\']",\n'
+        "    },\n"
+        "    {\n"
+        "      selector: \"node[type='Table']\",\n"
         '      style: { "shape": "round-rectangle", "border-width": 1, "border-color": "#475569" }\n'
-        '    },\n'
-        '    {\n'
-        '      selector: "node[type=\'Product\']",\n'
+        "    },\n"
+        "    {\n"
+        "      selector: \"node[type='Product']\",\n"
         '      style: { "shape": "diamond", "border-width": 2, "border-color": "#f59e0b" }\n'
-        '    },\n'
-        '    {\n'
+        "    },\n"
+        "    {\n"
         '      selector: "edge",\n'
-        '      style: {\n'
+        "      style: {\n"
         '        "width": 1.5,\n'
         '        "line-color": "#475569",\n'
         '        "target-arrow-color": "#475569",\n'
         '        "target-arrow-shape": "triangle",\n'
         '        "curve-style": "bezier"\n'
-        '      }\n'
-        '    },\n'
-        '    {\n'
+        "      }\n"
+        "    },\n"
+        "    {\n"
         '      selector: ":selected",\n'
         '      style: { "border-width": 3, "border-color": "#fbbf24" }\n'
-        '    },\n'
-        '    {\n'
+        "    },\n"
+        "    {\n"
         '      selector: ".highlighted",\n'
-        '      style: {\n'
+        "      style: {\n"
         '        "line-color": "#fbbf24",\n'
         '        "target-arrow-color": "#fbbf24",\n'
         '        "background-color": "#fbbf24",\n'
         '        "border-color": "#fbbf24"\n'
-        '      }\n'
-        '    },\n'
-        '    {\n'
+        "      }\n"
+        "    },\n"
+        "    {\n"
         '      selector: ".dimmed",\n'
         '      style: { "opacity": 0.15 }\n'
-        '    }\n'
-        '  ],\n'
-        '  layout: {\n'
+        "    }\n"
+        "  ],\n"
+        "  layout: {\n"
         '    name: "cose",\n'
-        '    idealEdgeLength: 60,\n'
-        '    nodeOverlap: 20,\n'
-        '    refresh: 20,\n'
-        '    fit: true,\n'
-        '    padding: 30,\n'
-        '    randomize: false,\n'
-        '    componentSpacing: 80,\n'
-        '    nodeRepulsion: 450000\n'
-        '  },\n'
-        '  zoomingEnabled: true,\n'
-        '  userZoomingEnabled: true,\n'
-        '  panningEnabled: true,\n'
-        '  userPanningEnabled: true,\n'
-        '  boxSelectionEnabled: true,\n'
+        "    idealEdgeLength: 60,\n"
+        "    nodeOverlap: 20,\n"
+        "    refresh: 20,\n"
+        "    fit: true,\n"
+        "    padding: 30,\n"
+        "    randomize: false,\n"
+        "    componentSpacing: 80,\n"
+        "    nodeRepulsion: 450000\n"
+        "  },\n"
+        "  zoomingEnabled: true,\n"
+        "  userZoomingEnabled: true,\n"
+        "  panningEnabled: true,\n"
+        "  userPanningEnabled: true,\n"
+        "  boxSelectionEnabled: true,\n"
         '  selectionType: "single"\n'
-        '});\n'
-        '\n'
+        "});\n"
+        "\n"
         'cy.on("tap", "node", function(evt) {\n'
-        '  var node = evt.target;\n'
+        "  var node = evt.target;\n"
         '  cy.elements().removeClass("highlighted dimmed");\n'
-        '  if (node.isSource() || node.isTarget()) {\n'
-        '    var neighbourhood = node.neighborhood();\n'
+        "  if (node.isSource() || node.isTarget()) {\n"
+        "    var neighbourhood = node.neighborhood();\n"
         '    neighbourhood.addClass("highlighted");\n'
-        '    var allOthers = cy.elements().difference(neighbourhood);\n'
+        "    var allOthers = cy.elements().difference(neighbourhood);\n"
         '    allOthers.addClass("dimmed");\n'
-        '  } else {\n'
+        "  } else {\n"
         '    node.addClass("highlighted");\n'
-        '  }\n'
-        '});\n'
-        '\n'
+        "  }\n"
+        "});\n"
+        "\n"
         'cy.on("tap", function(evt) {\n'
-        '  if (evt.target === cy) {\n'
+        "  if (evt.target === cy) {\n"
         '    cy.elements().removeClass("highlighted dimmed").unselectify();\n'
-        '  }\n'
-        '});\n'
-        '</script>\n'
-        '\n'
-        '</body>\n'
-        '</html>'
+        "  }\n"
+        "});\n"
+        "</script>\n"
+        "\n"
+        "</body>\n"
+        "</html>"
     )

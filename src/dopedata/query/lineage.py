@@ -72,6 +72,7 @@ def seed_walk(
 
 # ── pure BFS implementation ───────────────────────────────────────────
 
+
 def _seed_walk_pure(
     store: GraphStore,
     seed_connector_id: str,
@@ -113,9 +114,7 @@ def _seed_walk_pure(
                     continue
                 up_visited.add(nb_id)
                 _collect_node(collected_nodes, nb_id, nb)
-                _collect_edge(
-                    collected_edges, "SYNC_TO", node_id, nb_id
-                )
+                _collect_edge(collected_edges, "SYNC_TO", node_id, nb_id)
                 next_ids.add(nb_id)
 
                 if is_stale(_get_stale_property(nb)):
@@ -140,11 +139,18 @@ def _seed_walk_pure(
             # (edges go dbtModel → SnowflakeTable, so we follow "in" direction)
             nb_node = collected_nodes.get(node_id)
             if nb_node and nb_node.get("type") == NodeType.SNOWFLAKE_TABLE.value:
-                producing_models = store.neighbors(node_id, rel_type="PRODUCES", direction="in")
+                producing_models = store.neighbors(
+                    node_id, rel_type="PRODUCES", direction="in"
+                )
                 for nb in producing_models:
                     delta, added_ids = _process_downward_neighbor(
-                        nb, next_ids, down_visited, collected_nodes, collected_edges,
-                        "PRODUCES", node_id,
+                        nb,
+                        next_ids,
+                        down_visited,
+                        collected_nodes,
+                        collected_edges,
+                        "PRODUCES",
+                        node_id,
                     )
                     stale_count += delta
                     next_ids.update(added_ids)
@@ -154,8 +160,13 @@ def _seed_walk_pure(
                 deps = store.neighbors(node_id, rel_type="DEPENDS_ON", direction="out")
                 for nb in deps:
                     delta, added_ids = _process_downward_neighbor(
-                        nb, next_ids, down_visited, collected_nodes, collected_edges,
-                        "DEPENDS_ON", node_id,
+                        nb,
+                        next_ids,
+                        down_visited,
+                        collected_nodes,
+                        collected_edges,
+                        "DEPENDS_ON",
+                        node_id,
                     )
                     stale_count += delta
                     next_ids.update(added_ids)
@@ -176,9 +187,7 @@ def _seed_walk_pure(
                 if not test_id:
                     continue
                 _collect_node(collected_nodes, test_id, test_nb)
-                _collect_edge(
-                    collected_edges, "TESTS", test_id, nid
-                )
+                _collect_edge(collected_edges, "TESTS", test_id, nid)
                 if is_stale(_get_stale_property(test_nb)):
                     stale_count += 1
 
@@ -230,9 +239,7 @@ def _process_downward_neighbor(
     return stale_delta, {nb_id}
 
 
-def _collect_node(
-    collected: dict[str, dict], node_id: str, node_dict: dict
-) -> None:
+def _collect_node(collected: dict[str, dict], node_id: str, node_dict: dict) -> None:
     """Add a node to the collected set if not already present."""
     if node_id not in collected:
         # Build a minimal representation for output
@@ -240,8 +247,16 @@ def _collect_node(
             "id": node_id,
             "type": node_dict.get("type", ""),
         }
-        for key in ("name", "schema", "status", "freshness", "stale",
-                     "row_count", "materialization", "owner"):
+        for key in (
+            "name",
+            "schema",
+            "status",
+            "freshness",
+            "stale",
+            "row_count",
+            "materialization",
+            "owner",
+        ):
             if key in node_dict:
                 entry[key] = node_dict[key]
         collected[node_id] = entry
@@ -272,7 +287,9 @@ def _get_stale_property(node: dict) -> datetime.date | datetime.datetime | None:
                 return _parse_iso_date(val)
             except (ValueError, TypeError):
                 continue
-        elif val is not None and (isinstance(val, datetime.date) or isinstance(val, datetime.datetime)):
+        elif val is not None and (
+            isinstance(val, datetime.date) or isinstance(val, datetime.datetime)
+        ):
             return val
     return None
 
@@ -305,8 +322,16 @@ def _collect_node_kuzu(
             "id": node_id,
             "type": node_dict.get("type", ""),
         }
-        for key in ("name", "schema", "status", "freshness", "stale",
-                     "row_count", "materialization", "owner"):
+        for key in (
+            "name",
+            "schema",
+            "status",
+            "freshness",
+            "stale",
+            "row_count",
+            "materialization",
+            "owner",
+        ):
             if key in node_dict:
                 entry[key] = node_dict[key]
         collected[node_id] = entry
@@ -367,17 +392,17 @@ RETURN connectors, tables, models
     # Extract all nodes from result rows
     for row in results:
         # FivetranConnection nodes
-        for conn in (row.get("connectors") or []):
+        for conn in row.get("connectors") or []:
             if isinstance(conn, dict) and "id" in conn:
                 _collect_node_kuzu(nodes_map, str(conn["id"]), dict(conn))
 
         # SnowflakeTable nodes
-        for sf in (row.get("tables") or []):
+        for sf in row.get("tables") or []:
             if isinstance(sf, dict) and "id" in sf:
                 _collect_node_kuzu(nodes_map, str(sf["id"]), dict(sf))
 
         # dbtModel nodes
-        for model in (row.get("models") or []):
+        for model in row.get("models") or []:
             if isinstance(model, dict) and "id" in model:
                 _collect_node_kuzu(nodes_map, str(model["id"]), dict(model))
 
@@ -419,8 +444,7 @@ RETURN m, sf, r;"""
 
     # DEPENDS_ON edges between models
     model_ids_str = ", ".join(
-        f"'{mid}'" for mid, nd in nodes_map.items()
-        if nd.get("type") == "dbtModel"
+        f"'{mid}'" for mid, nd in nodes_map.items() if nd.get("type") == "dbtModel"
     )
     if model_ids_str:
         deps_query = f"""\
@@ -439,7 +463,9 @@ RETURN a, b;"""
                     bid = str(b_node["id"])
                     _collect_node_kuzu(nodes_map, bid, dict(b_node))
                 if isinstance(a_node, dict) and isinstance(b_node, dict):
-                    _collect_edge_kuzu(edges_map, "DEPENDS_ON", a_node["id"], b_node["id"])
+                    _collect_edge_kuzu(
+                        edges_map, "DEPENDS_ON", a_node["id"], b_node["id"]
+                    )
         except Exception:  # pragma: no cover
             pass
 

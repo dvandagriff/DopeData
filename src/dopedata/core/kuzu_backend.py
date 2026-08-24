@@ -1,19 +1,22 @@
 # Copyright 2026 Drew Vandagriff
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-# documentation files (the "Software"), to deal in the Software without restriction, including without
-# limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-# the Software, and to permit persons to whom the Software is furnished to do so, subject to the following
-# conditions:
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-# The above copyright notice and this permission notice shall be included in all copies or substantial
-# portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 #
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
-# LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO
-# EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-# AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
-# OR OTHER DEALINGS IN THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
 
 """Guarded Kùzu graph backend.
 
@@ -56,9 +59,7 @@ class _KuzuGraphUnavailable(GraphStore):
     def add_node(self, node_type: str, node_id: str, **props: Any) -> None:
         raise NotImplementedError("Kùzu backend unavailable")
 
-    def add_edge(
-        self, rel_type: str, from_id: str, to_id: str, **props: Any
-    ) -> None:
+    def add_edge(self, rel_type: str, from_id: str, to_id: str, **props: Any) -> None:
         raise NotImplementedError("Kùzu backend unavailable")
 
     def query(self, cypher: str, **params: Any) -> list[dict]:
@@ -96,7 +97,9 @@ class KuzuGraph(GraphStore):
         If ``True``, drop existing tables and re-run CYPHER_DDL on construction.
     """
 
-    def __init__(self, db_path: str = ":memory:", recreate: bool = False) -> None:  # noqa: ARG002
+    def __init__(
+        self, db_path: str = ":memory:", recreate: bool = False
+    ) -> None:  # noqa: ARG002
         self._db_path = db_path
         self._db = kuzu.Database(db_path)
         self._con = kuzu.Connection(self._db)
@@ -191,9 +194,7 @@ class KuzuGraph(GraphStore):
             values_list,
         )
 
-    def add_edge(
-        self, rel_type: str, from_id: str, to_id: str, **props: Any
-    ) -> None:
+    def add_edge(self, rel_type: str, from_id: str, to_id: str, **props: Any) -> None:
         """Insert a directed relation edge."""
         table_name = rel_type
         normalised_props = {k: self._normalise(v) for k, v in props.items()}
@@ -203,8 +204,7 @@ class KuzuGraph(GraphStore):
             src_table = self._node_from_type(rel_type)
             dst_table = self._node_to_type(rel_type)
             self._con.execute(
-                f"CREATE REL TABLE {table_name} "
-                f"(FROM {src_table} TO {dst_table});"
+                f"CREATE REL TABLE {table_name} " f"(FROM {src_table} TO {dst_table});"
             )
         except Exception:
             pass
