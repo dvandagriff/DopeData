@@ -10,7 +10,7 @@
 
 # DopeData
 
-### Pipeline Observability for the Modern Data Stack
+### Pipeline Explorability for the Modern Data Stack
 
 <!-- BADGE ROW -->
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
@@ -31,7 +31,7 @@
 
 ## &nbsp;&#128300;&nbsp; What Is DopeData?
 
-DopeData is a **local-first, zero-dependency pipeline observability toolkit** that maps your Fivetran &rarr; Snowflake &rarr; dbt data lineage into a queryable graph — and tells you whether your data is fresh according to business calendars, not just wall-clock timestamps.
+DopeData is a **local-first, zero-dependency pipeline explorability toolkit** that maps your Fivetran &rarr; Snowflake &rarr; dbt data lineage into a queryable graph — and tells you whether your data is fresh according to business calendars, not just wall-clock timestamps.
 
 It answers three questions every data team faces:
 

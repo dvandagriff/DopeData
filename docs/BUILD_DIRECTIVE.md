@@ -1,4 +1,4 @@
-# BUILD DIRECTIVE: DopeData: Data Observatory Pipeline Observability
+# BUILD DIRECTIVE: DopeData: Data Observatory Pipeline Explorability
 ## Apache 2.0 · Local FOSS Graph DB · Fivetran + dbt Lineage + Freshness  
 
 ---
@@ -527,7 +527,7 @@ production.
 [ ] The demo is complete, not a skeleton. 
 [ ] git log shows a single squashed commit with a clean message:
 ```
-"feat: pipeline observability — Fivetran + dbt lineage, freshness,
+"feat: pipeline explorability — Fivetran + dbt lineage, freshness,
 Kùzu backend, static viz" or equivalent.
 ```
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-`dope` (my-Pipeline-Observability) is a lightweight, zero-dependency pipeline observability toolkit for tracking Fivetran → dbt data lineage and freshness. It provides:
+`dopedata` (Data Observatory Pipeline Explorability) is a lightweight, zero-dependency pipeline explorability toolkit for tracking Fivetran → dbt data lineage and freshness. It provides:
 
 - **Graph-based lineage**: A minimal graph store (PurePyGraph or Kùzu-backed) with Cypher subset query support.
 - **Plugin-based ingestion**: `FivetranPlugin` and `DbtPlugin` load snapshot CSV/JSON files into the graph.

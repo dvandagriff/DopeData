@@ -15,7 +15,7 @@
 # AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Command-line interface for dopedata — pipeline observability."""
+"""Command-line interface for dopedata — pipeline explorability."""
 
 from __future__ import annotations
 
@@ -616,7 +616,7 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser."""
     parser = argparse.ArgumentParser(
         prog="dopedata",
-        description="Pipeline observability — Fivetran + dbt lineage, freshness, static viz",
+        description="Pipeline explorability — Fivetran + dbt lineage, freshness, static viz",
     )
     parser.add_argument(
         "--seed",
@@ -694,7 +694,7 @@ def main(argv: list[str] | None = None) -> int:
             seed_id = env_seed
 
     print("=" * 72)
-    print("Dopedata — Pipeline Observability")
+        print("D.O.P.E.")
     print(f"  mode         : {args.mode}")
     print(f"  backend      : {args.backend}")
     print(f"  view         : {args.view}")
