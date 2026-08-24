@@ -479,9 +479,8 @@ th { background: #f0f0f0; }
             stale_count += 1
 
         html_parts.append(f'<div class="connector-card">')
-        html_parts.append(f"<h2>{cname} <code>{cid}</code>"
-                          f'{" <span class=\"stale-tag\">STALE</span>" if is_stale_conn else " <span class=\"fresh-tag\">FRESH</span>"}'
-                          "</h2>")
+        tag = ' <span class="stale-tag">STALE</span>' if is_stale_conn else ' <span class="fresh-tag">FRESH</span>'
+        html_parts.append(f"<h2>{cname} <code>{cid}</code>{tag}</h2>")
 
         last_sync = wr.get("last_sync_end", "N/A")
         fd = wr.get("freshness_date", "N/A")

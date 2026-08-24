@@ -295,6 +295,39 @@ def _parse_iso_date(value: str) -> datetime.date | datetime.datetime:
 
 # ── Kùzu Cypher implementation ───────────────────────────────────────
 
+
+def _collect_node_kuzu(
+    collected: dict[str, dict], node_id: str, node_dict: dict
+) -> None:
+    """Add a node to the collected set if not already present (Kùzu backend)."""
+    if node_id not in collected:
+        entry = {
+            "id": node_id,
+            "type": node_dict.get("type", ""),
+        }
+        for key in ("name", "schema", "status", "freshness", "stale",
+                     "row_count", "materialization", "owner"):
+            if key in node_dict:
+                entry[key] = node_dict[key]
+        collected[node_id] = entry
+
+
+def _collect_edge_kuzu(
+    collected: dict[tuple[str, str, str], dict],
+    rel_type: str,
+    from_id: str,
+    to_id: str,
+) -> None:
+    """Add an edge to the collected set if not already present (Kùzu backend)."""
+    key = (rel_type, from_id, to_id)
+    if key not in collected:
+        collected[key] = {
+            "rel_type": rel_type,
+            "from_id": from_id,
+            "to_id": to_id,
+        }
+
+
 def _seed_walk_kuzu(
     store: GraphStore,
     seed_connector_id: str,
